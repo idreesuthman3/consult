@@ -3,1668 +3,1037 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-<title>Consulting - Strategic Solutions for Business Growth</title>
+<title>Consulting Admin Dashboard</title>
 
-<!-- Bootstrap 5 CSS -->
+<!-- Bootstrap 5 -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
 <!-- Bootstrap Icons -->
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
 <!-- Google Fonts -->
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.2/dist/chart.umd.min.js"></script>
 
 <style>
-  /* ===== BRAND VARIABLES ===== */
-  :root {
-    --brand-dark: #014d4e;
-    --brand-primary: #038b8c;
-    --brand-secondary: #14b8a6;
-    --brand-light: #f0fdfa;
-    --brand-accent: #34d399;
-    --white: #ffffff;
-    --gray-50: #f9fafb;
-    --gray-100: #f3f4f6;
-    --gray-200: #e5e7eb;
-    --gray-400: #9ca3af;
-    --gray-500: #6b7280;
-    --gray-600: #4b5563;
-    --gray-800: #1f2937;
-  }
+/* ===== ROOT VARIABLES ===== */
+:root {
+  --brand-dark:    #014d4e;
+  --brand-primary: #038b8c;
+  --brand-mid:     #059b9c;
+  --brand-light:   #e8f8f7;
+  --brand-xlight:  #f0fdfb;
+  --brand-accent:  #34d399;
+  --sidebar-w:     280px;
+  --sidebar-w-sm:  72px;
+  --topbar-h:      72px;
+  --white:         #ffffff;
+  --gray-50:       #f9fafb;
+  --gray-100:      #f3f4f6;
+  --gray-200:      #e5e7eb;
+  --gray-400:      #9ca3af;
+  --gray-500:      #6b7280;
+  --gray-700:      #374151;
+  --gray-800:      #1f2937;
+  --shadow-sm:     0 2px 8px rgba(1,77,78,0.07);
+  --shadow-md:     0 6px 24px rgba(1,77,78,0.10);
+  --shadow-lg:     0 12px 40px rgba(1,77,78,0.14);
+  --radius:        14px;
+  --radius-sm:     10px;
+}
 
-  /* ===== FORCE LIGHT MODE ===== */
-  html { color-scheme: light !important; }
-  * { color-scheme: light !important; }
+html, body {
+  height: 100%;
+  color-scheme: light !important;
+}
 
-  body {
-    font-family: 'DM Sans', sans-serif;
-    background-color: var(--white) !important;
-    color: var(--gray-800);
-    overflow-x: hidden;
-  }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--brand-xlight);
+  color: var(--gray-800);
+  overflow-x: hidden;
+}
 
-  h1,h2,h3,h4,h5,h6 { font-family: 'Syne', sans-serif; }
+h1,h2,h3,h4,h5,h6 { font-family: 'Syne', sans-serif; }
 
-  /* ===== PAGE LOADER ===== */
-  #page-loader {
-    position: fixed;
-    inset: 0;
-    background: var(--brand-dark);
-    z-index: 99999;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    transition: opacity 0.5s ease, visibility 0.5s ease;
-  }
-  #page-loader.hidden { opacity: 0; visibility: hidden; }
+/* ===== LAYOUT SHELL ===== */
+.dashboard-shell {
+  display: flex;
+  min-height: 100vh;
+}
 
-  .rolling-circle-loader {
-    position: relative;
-    width: 80px;
-    height: 80px;
-  }
-  .rolling-circle-loader svg {
-    animation: rotate 1.6s linear infinite;
-    transform-origin: center;
-  }
-  .rolling-circle-loader circle.track {
-    fill: none;
-    stroke: rgba(255,255,255,0.15);
-    stroke-width: 6;
-  }
-  .rolling-circle-loader circle.spin {
-    fill: none;
-    stroke: var(--brand-accent);
-    stroke-width: 6;
-    stroke-linecap: round;
-    stroke-dasharray: 160;
-    stroke-dashoffset: 40;
-    animation: rotate 1.6s linear infinite;
-  }
-  @keyframes rotate {
-    100% { transform: rotate(360deg); }
-  }
-  .loader-dot {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 12px;
-    height: 12px;
-    background: var(--brand-accent);
-    border-radius: 50%;
-    animation: pulse-dot 1.6s ease-in-out infinite;
-  }
-  @keyframes pulse-dot {
-    0%,100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-    50%      { transform: translate(-50%, -50%) scale(0.6); opacity: 0.5; }
-  }
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--brand-dark);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 1050;
+  transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1), width 0.35s;
+  overflow: hidden;
+}
 
-  /* ===== MOBILE MENU OVERLAY ENTRANCE ===== */
-  #menuOverlay {
-    position: fixed;
-    inset: 0;
-    background: var(--brand-dark);
-    z-index: 9999;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    clip-path: circle(0% at calc(100% - 56px) 36px);
-    transition: clip-path 0.7s cubic-bezier(0.77, 0, 0.175, 1);
-    pointer-events: none;
-    opacity: 0;
+.sidebar-brand {
+  padding: 1.5rem 1.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  min-height: var(--topbar-h);
+}
+
+.brand-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: white;
+  text-decoration: none;
+  letter-spacing: -0.5px;
+  white-space: nowrap;
+}
+.brand-logo span { color: var(--brand-accent); }
+
+.sidebar-toggle {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 1.25rem;
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: color 0.2s, background 0.2s;
+  flex-shrink: 0;
+}
+.sidebar-toggle:hover { color: white; background: rgba(255,255,255,0.08); }
+
+.sidebar-scroll {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 1.25rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar { width: 4px; }
+.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+
+.nav-section-label {
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.35);
+  padding: 0 1.75rem;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+}
+
+.nav-item-link {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.75rem 1.75rem;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  border-radius: 0;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap;
+  position: relative;
+}
+
+.nav-item-link i {
+  font-size: 1.1rem;
+  flex-shrink: 0;
+  width: 20px;
+  text-align: center;
+}
+
+.nav-item-link:hover {
+  color: white;
+  background: rgba(255,255,255,0.06);
+}
+
+.nav-item-link.active {
+  color: white;
+  background: var(--brand-primary);
+  font-weight: 600;
+}
+.nav-item-link.active::before {
+  content: '';
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: 3px;
+  background: var(--brand-accent);
+  border-radius: 0 2px 2px 0;
+}
+
+.nav-item-link .badge-count {
+  margin-left: auto;
+  background: var(--brand-accent);
+  color: var(--brand-dark);
+  font-size: 0.65rem;
+  font-weight: 700;
+  padding: 2px 7px;
+  border-radius: 20px;
+}
+
+.sidebar-footer {
+  padding: 1rem 0.75rem;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem 1rem;
+  background: var(--brand-primary);
+  color: white;
+  border: none;
+  border-radius: var(--radius-sm);
+  font-size: 0.9rem;
+  font-weight: 600;
+  width: 100%;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.2s;
+  font-family: 'DM Sans', sans-serif;
+  white-space: nowrap;
+}
+.logout-btn:hover { background: #025e60; transform: translateY(-1px); }
+.logout-btn i { font-size: 1rem; flex-shrink: 0; }
+
+/* Mobile overlay */
+.sidebar-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 1049;
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.show { display: block; }
+
+/* ===== MAIN CONTENT ===== */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: margin-left 0.35s;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+  height: var(--topbar-h);
+  background: white;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex;
+  align-items: center;
+  padding: 0 2rem;
+  gap: 1rem;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+
+.topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--gray-800);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.topbar-title span { color: var(--brand-primary); }
+
+.topbar-search {
+  flex: 1;
+  max-width: 300px;
+  margin-left: 1rem;
+}
+.search-wrap {
+  position: relative;
+}
+.search-wrap i {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--gray-400);
+  font-size: 0.9rem;
+}
+.search-input {
+  width: 100%;
+  padding: 0.5rem 1rem 0.5rem 2.25rem;
+  border: 1.5px solid var(--gray-200);
+  border-radius: 30px;
+  font-size: 0.8rem;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--brand-xlight);
+  color: var(--gray-700);
+  transition: border-color 0.2s, box-shadow 0.2s;
+  outline: none;
+}
+.search-input:focus {
+  border-color: var(--brand-primary);
+  box-shadow: 0 0 0 3px rgba(3,139,140,0.12);
+}
+
+.topbar-spacer { flex: 1; }
+
+.topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.action-btn {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  border: 1.5px solid var(--gray-200);
+  background: white;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-500);
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  text-decoration: none;
+}
+.action-btn:hover {
+  background: var(--brand-light);
+  color: var(--brand-primary);
+  border-color: var(--brand-primary);
+}
+.action-btn .notif-badge {
+  position: absolute;
+  top: -3px; right: -3px;
+  width: 16px; height: 16px;
+  background: #ef4444;
+  color: white;
+  font-size: 0.55rem;
+  font-weight: 700;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  border: 2px solid white;
+}
+
+.mobile-sidebar-toggle {
+  display: none;
+  background: none;
+  border: none;
+  color: var(--gray-700);
+  font-size: 1.4rem;
+  cursor: pointer;
+  padding: 4px;
+}
+
+/* ===== PAGE CONTENT ===== */
+.page-content {
+  flex: 1;
+  padding: 1.75rem 2rem;
+  display: grid;
+  grid-template-columns: 1fr 260px;
+  grid-template-rows: auto auto 1fr;
+  gap: 1.5rem;
+}
+
+/* ===== STAT CARDS ===== */
+.stat-cards-row {
+  grid-column: 1;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+}
+
+.stat-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.4rem 1.25rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s, transform 0.25s;
+  cursor: default;
+}
+.stat-card:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-3px);
+}
+
+.stat-icon-wrap {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.25rem;
+  margin-bottom: 1rem;
+}
+.icon-purple { background: #ede9fe; color: #7c3aed; }
+.icon-cyan   { background: #cffafe; color: #0891b2; }
+.icon-teal   { background: #ccfbf1; color: #0d9488; }
+.icon-coral  { background: #fee2e2; color: #dc2626; }
+
+.stat-label {
+  font-size: 0.78rem;
+  color: var(--gray-500);
+  margin-bottom: 4px;
+}
+.stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--gray-800);
+}
+.stat-change {
+  font-size: 0.72rem;
+  margin-top: 6px;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.stat-change.up   { color: #059669; }
+.stat-change.down { color: #dc2626; }
+
+/* ===== PROFILE CARD (right column top) ===== */
+.profile-col {
+  grid-column: 2;
+  grid-row: 1 / 3;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.profile-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.profile-avatar {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid var(--brand-light);
+  flex-shrink: 0;
+}
+.profile-avatar-placeholder {
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--brand-primary), var(--brand-dark));
+  display: flex; align-items: center; justify-content: center;
+  color: white;
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  border: 3px solid var(--brand-light);
+}
+.profile-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin: 0;
+}
+.profile-handle {
+  font-size: 0.78rem;
+  color: var(--gray-400);
+  margin: 0;
+}
+
+/* ===== ACTIVE CLIENTS CARD ===== */
+.active-clients-card {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.4rem;
+  box-shadow: var(--shadow-sm);
+  flex: 1;
+}
+.active-clients-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin-bottom: 1.2rem;
+}
+.client-item {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--gray-100);
+  transition: background 0.2s;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.client-item:last-child { border-bottom: none; }
+.client-item:hover { background: var(--brand-xlight); padding-left: 6px; }
+.client-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 2px solid var(--brand-light);
+}
+.client-avatar-placeholder {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+.client-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--brand-primary);
+  margin: 0;
+}
+.client-role {
+  font-size: 0.7rem;
+  color: var(--gray-400);
+  margin: 0;
+}
+.online-dot {
+  width: 8px; height: 8px;
+  background: var(--brand-accent);
+  border-radius: 50%;
+  margin-left: auto;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 2px rgba(52,211,153,0.25);
+}
+
+.view-all-btn {
+  display: block;
+  width: 100%;
+  margin-top: 1rem;
+  padding: 0.7rem;
+  border: 1.5px solid var(--brand-primary);
+  border-radius: 8px;
+  background: white;
+  color: var(--brand-primary);
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.view-all-btn:hover {
+  background: var(--brand-primary);
+  color: white;
+}
+
+/* ===== CHART CARD ===== */
+.chart-card {
+  grid-column: 1;
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+}
+.chart-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+}
+.chart-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--gray-800);
+  margin: 0;
+}
+.chart-period-btns {
+  display: flex;
+  gap: 0.4rem;
+}
+.period-btn {
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  border: 1.5px solid var(--gray-200);
+  background: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--gray-500);
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.period-btn.active, .period-btn:hover {
+  background: var(--brand-primary);
+  color: white;
+  border-color: var(--brand-primary);
+}
+.chart-wrap {
+  position: relative;
+  height: 280px;
+}
+
+/* ===== FOOTER ===== */
+.dashboard-footer {
+  background: var(--brand-light);
+  border-top: 1px solid var(--gray-200);
+  text-align: center;
+  padding: 1rem 2rem;
+  font-size: 0.8rem;
+  color: var(--gray-500);
+  grid-column: 1 / -1;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+  .stat-cards-row { grid-template-columns: repeat(2, 1fr); }
+  .page-content { grid-template-columns: 1fr 240px; }
+}
+
+@media (max-width: 991px) {
+  .sidebar {
+    transform: translateX(calc(-1 * var(--sidebar-w)));
   }
-  #menuOverlay.open {
-    clip-path: circle(150% at calc(100% - 56px) 36px);
-    pointer-events: all;
-    opacity: 1;
-  }
-  #menuOverlay nav a {
-    display: block;
-    font-family: 'Syne', sans-serif;
-    font-size: 2.2rem;
-    font-weight: 700;
-    color: rgba(255,255,255,0.15);
-    text-decoration: none;
-    margin: 0.25rem 0;
-    transition: color 0.3s ease, transform 0.3s ease;
-    transform: translateX(-30px);
-    opacity: 0;
-  }
-  #menuOverlay.open nav a {
-    color: var(--white);
+  .sidebar.open {
     transform: translateX(0);
-    opacity: 1;
   }
-  #menuOverlay.open nav a:nth-child(1) { transition-delay: 0.1s; }
-  #menuOverlay.open nav a:nth-child(2) { transition-delay: 0.15s; }
-  #menuOverlay.open nav a:nth-child(3) { transition-delay: 0.2s; }
-  #menuOverlay.open nav a:nth-child(4) { transition-delay: 0.25s; }
-  #menuOverlay.open nav a:nth-child(5) { transition-delay: 0.3s; }
-  #menuOverlay.open nav a:nth-child(6) { transition-delay: 0.35s; }
-  #menuOverlay.open nav a:nth-child(7) { transition-delay: 0.4s; }
-  #menuOverlay.open nav a:nth-child(8) { transition-delay: 0.45s; }
-  #menuOverlay nav a:hover { color: var(--brand-accent) !important; transform: translateX(12px) !important; }
-  .menu-close-btn {
-    position: absolute;
-    top: 20px;
-    right: 24px;
-    background: none;
-    border: none;
-    color: white;
-    font-size: 2rem;
-    cursor: pointer;
-    z-index: 1;
+  .main-content {
+    margin-left: 0;
   }
-  .menu-social {
-    display: flex;
-    gap: 1rem;
-    margin-top: 2rem;
+  .mobile-sidebar-toggle { display: flex; }
+  .page-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
   }
-  .menu-social a {
-    width: 42px; height: 42px;
-    border: 1.5px solid rgba(255,255,255,0.3);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white !important;
-    font-size: 1rem;
-    text-decoration: none;
-    transition: border-color 0.3s, background 0.3s;
+  .stat-cards-row {
+    grid-column: 1;
+    grid-template-columns: repeat(2, 1fr);
   }
-  .menu-social a:hover { background: var(--brand-accent); border-color: var(--brand-accent); }
-
-  /* ===== NAVBAR ===== */
-  .main-navbar {
-    background: var(--brand-dark);
-    position: sticky;
-    top: 0;
-    z-index: 1040;
-    padding: 1rem 0;
-  }
-  .navbar-brand-text {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.5rem;
-    font-weight: 800;
-    color: white;
-    text-decoration: none;
-    letter-spacing: -0.5px;
-  }
-  .navbar-brand-text span { color: var(--brand-accent); }
-  .desktop-nav a {
-    color: rgba(255,255,255,0.85);
-    text-decoration: none;
-    font-size: 0.875rem;
-    font-weight: 500;
-    padding: 0.25rem 0.1rem;
-    position: relative;
-    transition: color 0.3s;
-  }
-  .desktop-nav a::after {
-    content: '';
-    position: absolute;
-    bottom: -2px; left: 0;
-    width: 0; height: 2px;
-    background: var(--brand-accent);
-    transition: width 0.3s;
-  }
-  .desktop-nav a:hover { color: var(--brand-accent); }
-  .desktop-nav a:hover::after { width: 100%; }
-  .btn-get-started {
-    background: var(--brand-secondary);
-    color: white !important;
-    padding: 0.5rem 1.4rem;
-    border-radius: 6px;
-    font-weight: 600;
-    font-size: 0.875rem;
-    text-decoration: none;
-    border: none;
-    transition: background 0.3s, transform 0.2s;
-    display: inline-block;
-  }
-  .btn-get-started:hover { background: var(--brand-primary); transform: translateY(-1px); }
-  .hamburger-btn {
-    background: none;
-    border: none;
-    color: white;
-    font-size: 1.6rem;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 42px; height: 42px;
-    border-radius: 8px;
-    transition: background 0.3s;
-  }
-  .hamburger-btn:hover { background: rgba(255,255,255,0.1); }
-
-  /* ===== HERO ===== */
-  .hero-section {
-    background: linear-gradient(135deg, var(--brand-dark) 0%, #023e3f 60%, #025a5b 100%);
-    color: white;
-    padding: 5rem 0 6rem;
-    position: relative;
-    overflow: hidden;
-  }
-  .hero-section::before {
-    content: '';
-    position: absolute;
-    top: -60px; right: -60px;
-    width: 400px; height: 400px;
-    border-radius: 50%;
-    background: rgba(20, 184, 166, 0.07);
-    pointer-events: none;
-  }
-  .hero-section::after {
-    content: '';
-    position: absolute;
-    bottom: -80px; left: -80px;
-    width: 320px; height: 320px;
-    border-radius: 50%;
-    background: rgba(52, 211, 153, 0.06);
-    pointer-events: none;
-  }
-  .hero-h1 {
-    font-size: clamp(2rem, 5vw, 3.5rem);
-    font-weight: 800;
-    line-height: 1.15;
-    margin-bottom: 1.5rem;
-  }
-  .hero-stat-num {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.8rem;
-    font-weight: 700;
-    color: white;
-  }
-  .hero-stat-lbl {
-    font-size: 0.7rem;
-    color: var(--brand-accent);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
-    margin-top: 2px;
-  }
-  .hero-img-wrap img { border-radius: 12px; width: 100%; box-shadow: 0 30px 80px rgba(0,0,0,0.4); }
-  .hero-divider { border-top: 1px solid rgba(255,255,255,0.12); padding-top: 2rem; margin-top: 2.5rem; }
-  .btn-hero-primary {
-    background: white; color: var(--brand-dark);
-    padding: 0.8rem 2rem; border-radius: 6px; font-weight: 700;
-    border: none; transition: all 0.3s; font-family: 'DM Sans', sans-serif; cursor: pointer;
-  }
-  .btn-hero-primary:hover { background: var(--gray-100); transform: translateY(-2px); }
-  .btn-hero-outline {
-    background: transparent;
-    color: var(--brand-secondary);
-    border: 2px solid var(--brand-secondary);
-    padding: 0.8rem 2rem; border-radius: 6px; font-weight: 700;
-    transition: all 0.3s; font-family: 'DM Sans', sans-serif; cursor: pointer;
-  }
-  .btn-hero-outline:hover { background: var(--brand-secondary); color: white; transform: translateY(-2px); }
-
-  /* ===== SECTION BADGE ===== */
-  .section-badge {
-    display: inline-block;
-    font-size: 0.75rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.12em;
-    color: var(--brand-primary);
-    margin-bottom: 0.75rem;
-  }
-  .section-title {
-    font-family: 'Syne', sans-serif;
-    font-size: clamp(1.75rem, 3.5vw, 2.5rem);
-    font-weight: 800;
-    color: var(--brand-dark);
-    line-height: 1.25;
-  }
-
-  /* ===== POTENTIAL / ABOUT ===== */
-  .potential-section { padding: 5rem 0; }
-  .potential-img-wrap { position: relative; }
-  .potential-img-wrap img { border-radius: 12px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.1); }
-  .experience-badge {
-    position: absolute;
-    bottom: -24px; right: -20px;
-    background: var(--brand-primary);
-    color: white;
-    padding: 1.5rem 2rem;
-    border-radius: 10px;
-    box-shadow: 0 10px 30px rgba(3,139,140,0.3);
-    text-align: center;
-  }
-  .experience-badge .num { font-family: 'Syne', sans-serif; font-size: 2rem; font-weight: 800; }
-  .experience-badge .lbl { font-size: 0.75rem; opacity: 0.85; }
-  .feature-icon { color: var(--brand-primary); margin-bottom: 0.75rem; }
-  .feature-icon svg { width: 40px; height: 40px; }
-  .btn-dark-brand {
-    background: var(--brand-dark); color: white;
-    padding: 0.75rem 2rem; border-radius: 6px; font-weight: 700;
-    border: none; transition: all 0.3s; cursor: pointer;
-  }
-  .btn-dark-brand:hover { opacity: 0.9; transform: translateY(-2px); }
-
-  /* ===== PROCESS SECTION ===== */
-  .process-section { background: var(--brand-light); padding: 5rem 0; }
-  .process-step {
-    display: flex; gap: 1.5rem; align-items: flex-start;
-    padding: 1.25rem;
-    border-radius: 12px;
-    transition: background 0.3s, box-shadow 0.3s;
-    cursor: pointer;
-  }
-  .process-step:hover, .process-step.active {
-    background: white;
-    box-shadow: 0 8px 25px rgba(3,139,140,0.12);
-  }
-  .step-num {
-    flex-shrink: 0;
-    width: 64px; height: 64px;
-    border-radius: 50%;
-    border: 2px solid var(--brand-primary);
-    display: flex; align-items: center; justify-content: center;
-    font-family: 'Syne', sans-serif;
-    font-size: 1.3rem; font-weight: 800;
-    color: var(--brand-primary);
-    transition: background 0.3s, color 0.3s, border-color 0.3s;
-  }
-  .process-step:hover .step-num,
-  .process-step.active .step-num {
-    background: var(--brand-primary);
-    color: white;
-    border-color: var(--brand-primary);
-  }
-  .btn-brand-primary {
-    background: var(--brand-primary); color: white;
-    padding: 0.75rem 2rem; border-radius: 6px; font-weight: 700;
-    border: none; transition: all 0.3s; cursor: pointer;
-  }
-  .btn-brand-primary:hover { background: var(--brand-dark); transform: translateY(-2px); }
-  .btn-brand-outline {
-    background: transparent; color: var(--brand-primary);
-    border: 2px solid var(--brand-primary);
-    padding: 0.75rem 2rem; border-radius: 6px; font-weight: 700;
-    transition: all 0.3s; cursor: pointer;
-  }
-  .btn-brand-outline:hover { background: var(--brand-primary); color: white; }
-
-  /* ===== SERVICES ===== */
-  .services-section { padding: 5rem 0; }
-  .service-card {
-    border: 1px solid var(--gray-100);
-    border-radius: 12px;
-    padding: 2rem;
-    transition: box-shadow 0.3s, transform 0.3s, border-color 0.3s;
-    height: 100%;
-    background: white;
-  }
-  .service-card:hover {
-    box-shadow: 0 15px 40px rgba(3,139,140,0.12);
-    transform: translateY(-4px);
-    border-color: var(--brand-secondary);
-  }
-  .service-icon { color: var(--brand-primary); margin-bottom: 1.5rem; }
-  .service-icon svg { width: 48px; height: 48px; }
-  .service-link {
-    color: var(--brand-primary);
-    font-weight: 700; font-size: 0.875rem;
-    text-decoration: none;
-    border-bottom: 2px solid var(--brand-primary);
-    padding-bottom: 2px;
-    transition: color 0.3s;
-  }
-  .service-link:hover { color: var(--brand-dark); border-color: var(--brand-dark); }
-  .service-bullet { width: 6px; height: 6px; background: var(--brand-primary); border-radius: 50%; display: inline-block; margin-right: 8px; flex-shrink: 0; }
-
-  /* ===== CONSULTATION FORM ===== */
-  .consultation-section { padding: 5rem 0; }
-  .consultation-box {
-    border: 4px solid var(--brand-light);
-    border-radius: 20px;
-    padding: 3rem 4rem;
-  }
-  @media (max-width: 768px) { .consultation-box { padding: 2rem 1.5rem; } }
-  .form-control-brand {
-    background: var(--brand-light); border: none;
-    padding: 0.8rem 1rem; border-radius: 6px;
-    font-size: 0.9rem; width: 100%;
-    transition: box-shadow 0.3s;
-  }
-  .form-control-brand:focus {
-    outline: none;
-    box-shadow: 0 0 0 3px rgba(3,139,140,0.2);
-    background: var(--brand-light);
-  }
-
-  /* ===== WHY CHOOSE US ===== */
-  .why-section { padding: 5rem 0; background: white; overflow: hidden; }
-  .why-feature-icon {
-    background: var(--brand-dark);
-    color: white;
-    width: 42px; height: 42px;
-    border-radius: 8px;
-    display: flex; align-items: center; justify-content: center;
-    flex-shrink: 0;
-  }
-  .why-feature-icon svg { width: 22px; height: 22px; }
-  .why-stats-grid {
-    position: absolute;
-    top: -40px; left: -40px;
+  .profile-col {
+    grid-column: 1;
+    grid-row: auto;
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 12px;
-    z-index: 10;
+    gap: 1rem;
   }
-  .why-stat-box {
-    background: var(--brand-light);
-    padding: 1rem;
-    border-radius: 8px;
-    text-align: center;
-    min-width: 120px;
-  }
-  .why-stat-box .num {
-    font-family: 'Syne', sans-serif;
-    font-size: 1.4rem; font-weight: 800;
-    color: var(--brand-dark);
-  }
-  .why-stat-box .lbl { font-size: 0.65rem; color: var(--gray-500); }
-  @media (max-width: 991px) {
-    .why-stats-grid { position: static; margin-bottom: 1.5rem; }
-  }
-  .why-img-wrap {
-    position: relative;
-    padding-top: 50px;
-    padding-left: 50px;
-  }
-  @media (max-width: 991px) {
-    .why-img-wrap { padding: 0; margin-top: 2rem; }
-  }
-  .why-img-wrap img { border-radius: 24px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.12); }
-  .exp-badge-why {
-    position: absolute;
-    bottom: -20px; right: -16px;
-    background: var(--brand-primary);
-    color: white; padding: 1.25rem 1.5rem;
-    border-radius: 16px; text-align: center;
-  }
-  .exp-badge-why .num { font-family: 'Syne', sans-serif; font-size: 1.8rem; font-weight: 800; }
+  .active-clients-card { grid-column: 1 / -1; }
+  .chart-card { grid-column: 1; }
+  .topbar-search { max-width: 200px; }
+}
 
-  /* ===== TEAM SLIDER ===== */
-  .team-section { background: var(--brand-light); padding: 5rem 0; }
-  .team-slider-outer { overflow: hidden; position: relative; }
-  .team-slider-track { display: flex; transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-  .team-slide { flex-shrink: 0; padding: 0 12px; box-sizing: border-box; }
-  .team-card {
-    background: white;
-    border-radius: 14px;
-    padding: 1.5rem;
-    text-align: center;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.06);
-    transition: box-shadow 0.3s, transform 0.3s;
-  }
-  .team-card:hover { box-shadow: 0 10px 30px rgba(3,139,140,0.15); transform: translateY(-4px); }
-  .team-card img { width: 100%; border-radius: 10px; margin-bottom: 1.25rem; filter: grayscale(0.4); transition: filter 0.5s; }
-  .team-card:hover img { filter: grayscale(0); }
-  .team-social-btn {
-    width: 32px; height: 32px;
-    border-radius: 50%;
-    background: var(--brand-light);
-    display: inline-flex; align-items: center; justify-content: center;
-    color: var(--brand-primary); font-size: 0.8rem;
-    transition: background 0.3s, color 0.3s;
-  }
-  .team-social-btn:hover { background: var(--brand-primary); color: white; }
-  .slider-btn {
-    width: 42px; height: 42px;
-    border-radius: 50%;
-    border: 2px solid var(--brand-primary);
-    background: white;
-    color: var(--brand-primary);
-    display: inline-flex; align-items: center; justify-content: center;
-    cursor: pointer;
-    font-size: 1.1rem;
-    transition: background 0.3s, color 0.3s;
-  }
-  .slider-btn:hover { background: var(--brand-primary); color: white; }
-  .slider-dot {
-    width: 8px; height: 8px;
-    border-radius: 50%;
-    background: var(--gray-300);
-    display: inline-block;
-    margin: 0 4px;
-    cursor: pointer;
-    transition: background 0.3s, width 0.3s;
-  }
-  .slider-dot.active { background: var(--brand-primary); width: 28px; border-radius: 4px; }
+@media (max-width: 576px) {
+  .stat-cards-row { grid-template-columns: 1fr 1fr; gap: 0.75rem; }
+  .page-content { padding: 1.25rem 1rem; gap: 1rem; }
+  .topbar { padding: 0 1rem; }
+  .topbar-title { font-size: 1.2rem; }
+  .topbar-search { display: none; }
+  .profile-col { grid-template-columns: 1fr; }
+  .chart-period-btns { display: none; }
+  .chart-wrap { height: 220px; }
+}
 
-  /* ===== TESTIMONIALS ===== */
-  .testimonials-section { padding: 5rem 0; }
-  .testimonial-card {
-    background: white;
-    border: 1px solid var(--gray-100);
-    border-radius: 14px;
-    padding: 2rem;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-    height: 100%;
-    transition: box-shadow 0.3s, transform 0.3s;
-  }
-  .testimonial-card:hover { box-shadow: 0 12px 30px rgba(3,139,140,0.12); transform: translateY(-3px); }
-  .stars { color: #f59e0b; font-size: 1.1rem; margin-bottom: 1rem; }
-  .quote-icon { opacity: 0.25; color: var(--brand-light); }
+/* ===== ANIMATIONS ===== */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stat-card, .profile-card, .active-clients-card, .chart-card {
+  animation: fadeSlideUp 0.5s ease both;
+}
+.stat-card:nth-child(1) { animation-delay: 0.05s; }
+.stat-card:nth-child(2) { animation-delay: 0.1s; }
+.stat-card:nth-child(3) { animation-delay: 0.15s; }
+.stat-card:nth-child(4) { animation-delay: 0.2s; }
+.profile-card           { animation-delay: 0.08s; }
+.active-clients-card    { animation-delay: 0.12s; }
+.chart-card             { animation-delay: 0.22s; }
 
-  /* ===== PRICING ===== */
-  .pricing-section { background: var(--brand-light); padding: 5rem 0; }
-  .pricing-card {
-    background: white;
-    border-radius: 20px;
-    border: 2px solid transparent;
-    padding: 2.5rem;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.07);
-    transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
-    position: relative;
-    height: 100%;
-  }
-  .pricing-card:hover { border-color: var(--brand-primary); transform: translateY(-6px); box-shadow: 0 20px 50px rgba(3,139,140,0.14); }
-  .pricing-card.featured { border: 4px solid var(--brand-primary); box-shadow: 0 20px 60px rgba(3,139,140,0.2); }
-  .pricing-badge {
-    position: absolute;
-    top: -16px; left: 50%; transform: translateX(-50%);
-    background: var(--brand-primary); color: white;
-    font-size: 0.7rem; font-weight: 700; padding: 4px 16px;
-    border-radius: 20px;
-  }
-  .pricing-price {
-    font-family: 'Syne', sans-serif;
-    font-size: 2.5rem; font-weight: 800;
-    color: var(--brand-dark);
-  }
-  .toggle-wrap { display: flex; align-items: center; gap: 1rem; justify-content: center; }
-  .toggle-switch {
-    width: 56px; height: 28px;
-    background: var(--brand-primary);
-    border-radius: 14px;
-    position: relative;
-    cursor: pointer;
-    transition: background 0.3s;
-  }
-  .toggle-switch::after {
-    content: '';
-    position: absolute;
-    top: 4px; right: 4px;
-    width: 20px; height: 20px;
-    background: white;
-    border-radius: 50%;
-    transition: right 0.3s;
-  }
-  .toggle-switch.monthly::after { right: auto; left: 4px; }
-  .save-badge {
-    background: var(--brand-primary); color: white;
-    font-size: 0.65rem; font-weight: 700;
-    padding: 3px 10px; border-radius: 20px;
-  }
-
-  /* ===== FAQ ===== */
-  .faq-section { padding: 5rem 0; }
-  .accordion-brand .accordion-item {
-    border: 1px solid var(--gray-100);
-    border-radius: 10px !important;
-    margin-bottom: 0.75rem;
-    overflow: hidden;
-  }
-  .accordion-brand .accordion-button {
-    font-family: 'Syne', sans-serif;
-    font-weight: 700; font-size: 0.95rem;
-    color: var(--brand-dark) !important;
-    background: white !important;
-    padding: 1.25rem 1.5rem;
-    box-shadow: none !important;
-  }
-  .accordion-brand .accordion-button:not(.collapsed) { color: var(--brand-primary) !important; }
-  .accordion-brand .accordion-button::after { filter: none; }
-  .accordion-brand .accordion-button:not(.collapsed)::after {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23038b8c'%3E%3Cpath d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3E%3C/svg%3E");
-  }
-  .accordion-brand .accordion-body { background: white; color: var(--gray-500); font-size: 0.875rem; line-height: 1.7; padding: 0 1.5rem 1.25rem; }
-  .faq-cta {
-    background: var(--brand-light);
-    border-radius: 20px;
-    padding: 2.5rem;
-    text-align: center;
-  }
-  .faq-cta-icon {
-    width: 60px; height: 60px;
-    background: var(--brand-primary);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: white; font-size: 1.5rem;
-    margin: 0 auto 1.5rem;
-  }
-
-  /* ===== CONTACT ===== */
-  .contact-section { padding: 5rem 0; }
-  .contact-icon-wrap {
-    width: 48px; height: 48px;
-    background: var(--brand-light);
-    border-radius: 50%;
-    display: flex; align-items: center; justify-content: center;
-    color: var(--brand-primary); font-size: 1.2rem;
-    flex-shrink: 0;
-  }
-  .social-btn {
-    width: 40px; height: 40px;
-    border-radius: 50%;
-    border: 1px solid var(--gray-200);
-    display: flex; align-items: center; justify-content: center;
-    color: var(--gray-400); font-size: 0.85rem;
-    cursor: pointer; transition: all 0.3s;
-    text-decoration: none;
-  }
-  .social-btn:hover { color: var(--brand-primary); border-color: var(--brand-primary); }
-  .contact-form-card {
-    background: white;
-    border: 1px solid var(--gray-100);
-    border-radius: 20px;
-    padding: 2.5rem;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.08);
-  }
-  .form-label-brand {
-    font-size: 0.7rem; font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: var(--brand-dark);
-    margin-bottom: 0.5rem;
-  }
-
-  /* ===== FOOTER ===== */
-  .main-footer { background: var(--brand-light); padding: 4rem 0 2rem; }
-  .footer-divider { border-top: 1px solid var(--gray-200); margin: 2rem 0; }
-  .footer-info-icon { color: var(--brand-primary); font-size: 1.2rem; flex-shrink: 0; margin-top: 2px; }
-
-  /* ===== BACK TO TOP ===== */
-  #backToTop {
-    position: fixed;
-    bottom: 36px; right: 36px;
-    width: 52px; height: 52px;
-    border-radius: 50%;
-    background: var(--brand-primary);
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-size: 1.3rem;
-    display: flex; align-items: center; justify-content: center;
-    box-shadow: 0 6px 24px rgba(3,139,140,0.35);
-    opacity: 0; visibility: hidden;
-    transform: translateY(16px);
-    transition: opacity 0.35s, visibility 0.35s, transform 0.35s, background 0.3s;
-    z-index: 9000;
-  }
-  #backToTop.show { opacity: 1; visibility: visible; transform: translateY(0); }
-  #backToTop:hover { background: var(--brand-dark); }
-
-  /* The rolling progress ring around back-to-top */
-  #backToTop svg.progress-ring {
-    position: absolute;
-    inset: 0;
-    width: 52px; height: 52px;
-    transform: rotate(-90deg);
-    pointer-events: none;
-  }
-  #backToTop svg.progress-ring circle {
-    fill: none;
-    stroke: var(--brand-accent);
-    stroke-width: 3;
-    stroke-dasharray: 140;
-    stroke-dashoffset: 140;
-    transition: stroke-dashoffset 0.1s;
-    stroke-linecap: round;
-  }
-
-  /* ===== STATS COUNTER ===== */
-  .counter-value { font-family: 'Syne', sans-serif; }
-
-  /* ===== ANIMATIONS ===== */
-  .fade-in-up {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease, transform 0.6s ease;
-  }
-  .fade-in-up.visible { opacity: 1; transform: translateY(0); }
-
-  /* ===== GENERAL HELPERS ===== */
-  .text-brand { color: var(--brand-primary) !important; }
-  .text-brand-dark { color: var(--brand-dark) !important; }
-  .text-muted-sm { font-size: 0.875rem; color: var(--gray-500); }
-  .bullet-list { list-style: none; padding: 0; }
-  .bullet-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; margin-bottom: 0.5rem; }
-  .rounded-brand { border-radius: 12px; }
-
-  @media (max-width: 768px) {
-    .desktop-nav, .btn-get-started { display: none !important; }
-    .hamburger-btn { display: flex !important; }
-    .why-stats-grid { position: static; margin-bottom: 1.5rem; }
-    .potential-img-wrap { margin-bottom: 3rem; }
-    .experience-badge { right: 10px; }
-    #backToTop { bottom: 20px; right: 20px; }
-  }
-  @media (min-width: 769px) {
-    .hamburger-btn { display: none !important; }
-  }
+/* ===== SCROLLBAR (global) ===== */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
 </style>
 </head>
 <body>
 
-<!-- ===== PAGE LOADER ===== -->
-<div id="page-loader">
-  <div class="rolling-circle-loader">
-    <svg viewBox="0 0 80 80">
-      <circle class="track" cx="40" cy="40" r="34"/>
-      <circle class="spin" cx="40" cy="40" r="34"/>
-    </svg>
-    <div class="loader-dot"></div>
-  </div>
-</div>
+<!-- Sidebar overlay (mobile) -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
 
-<!-- ===== MOBILE MENU OVERLAY ===== -->
-<div id="menuOverlay">
-  <button class="menu-close-btn" id="menuCloseBtn" aria-label="Close menu">
-    <i class="bi bi-x-lg"></i>
-  </button>
-  <nav class="text-center">
-    <a href="#hero">Home</a>
-    <a href="#potential">About</a>
-    <a href="#services">Services</a>
-    <a href="#why">Why Choose Us</a>
-    <a href="#pricing">Pricing</a>
-    <a href="#team">Team</a>
-    <a href="#testimonials">Testimonials</a>
-    <a href="#contact">Contacts</a>
-  </nav>
-  <div class="menu-social mt-4">
-    <a href="#"><i class="bi bi-facebook"></i></a>
-    <a href="#"><i class="bi bi-twitter-x"></i></a>
-    <a href="#"><i class="bi bi-linkedin"></i></a>
-    <a href="#"><i class="bi bi-instagram"></i></a>
-  </div>
-</div>
+<!-- ===== DASHBOARD SHELL ===== -->
+<div class="dashboard-shell">
 
-<!-- ===== NAVBAR ===== -->
-<header class="main-navbar" id="mainNav">
-  <div class="container">
-    <div class="d-flex justify-content-between align-items-center">
-      <a href="#hero" class="navbar-brand-text">Consult<span>.</span></a>
-      <nav class="desktop-nav d-flex gap-4 align-items-center">
-        <a href="#hero">Home</a>
-        <a href="#potential">About</a>
-        <a href="#services">Services</a>
-        <a href="#why">Why Choose Us</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#team">Team</a>
-        <a href="#contact">Contacts</a>
-      </nav>
-      <div class="d-flex align-items-center gap-3">
-        <a href="#contact" class="btn-get-started">Get Started</a>
-        <button class="hamburger-btn" id="menuOpenBtn" aria-label="Open menu">
-          <i class="bi bi-list"></i>
+  <!-- ===== SIDEBAR ===== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <a href="#" class="brand-logo">Consult<span>.</span></a>
+      <button class="sidebar-toggle" id="desktopToggle" title="Toggle sidebar">
+        <i class="bi bi-layout-sidebar-reverse"></i>
+      </button>
+    </div>
+
+    <div class="sidebar-scroll">
+      <div class="nav-section-label mb-3">Menu</div>
+
+      <a href="#" class="nav-item-link active">
+        <i class="bi bi-grid-1x2-fill"></i>
+        <span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-people-fill"></i>
+        <span>Clients</span>
+        <span class="badge-count">24</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-wallet2"></i>
+        <span>Wallet</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-arrow-left-right"></i>
+        <span>Transactions</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-chat-dots-fill"></i>
+        <span>Messages</span>
+        <span class="badge-count">7</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-file-earmark-text"></i>
+        <span>Submitted Quotes</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-activity"></i>
+        <span>Activities</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-person-circle"></i>
+        <span>Profile</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-gear-fill"></i>
+        <span>Settings</span>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="logout-btn">
+        <i class="bi bi-power"></i>
+        <span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- ===== MAIN ===== -->
+  <div class="main-content" id="mainContent">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="mobile-sidebar-toggle" id="mobileToggle">
+        <i class="bi bi-list"></i>
+      </button>
+
+      <div class="topbar-title">Welcome <span>Admin!</span></div>
+
+      <div class="topbar-search">
+        <div class="search-wrap">
+          <i class="bi bi-search"></i>
+          <input class="search-input" type="text" placeholder="Enter Name, ID Number"/>
+        </div>
+      </div>
+
+      <div class="topbar-spacer"></div>
+
+      <div class="topbar-actions">
+        <button class="action-btn" title="Theme">
+          <i class="bi bi-brightness-high-fill"></i>
+        </button>
+        <button class="action-btn" title="Messages">
+          <i class="bi bi-chat-square-dots-fill"></i>
+        </button>
+        <button class="action-btn" title="Notifications">
+          <i class="bi bi-bell-fill"></i>
+          <span class="notif-badge">3</span>
         </button>
       </div>
-    </div>
-  </div>
-</header>
+    </header>
 
-<!-- ===== HERO ===== -->
-<section class="hero-section" id="hero">
-  <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6 fade-in-up">
-        <h1 class="hero-h1">Strategic Solutions for <br class="d-none d-md-block"/> Business Growth</h1>
-        <p class="mb-5" style="color:rgba(255,255,255,0.75);max-width:480px;line-height:1.8;">
-          Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Sed do eiusmod tempor incididunt ut labore.
-        </p>
-        <div class="d-flex flex-wrap gap-3 mb-5">
-          <button class="btn-hero-primary">Get Free Consultation</button>
-          <button class="btn-hero-outline">Our Services</button>
-        </div>
-        <div class="hero-divider">
-          <div class="row g-4">
-            <div class="col-4">
-              <div class="hero-stat-num counter-value" data-target="15" data-suffix="+">0</div>
-              <div class="hero-stat-lbl">Years Experience</div>
-            </div>
-            <div class="col-4">
-              <div class="hero-stat-num counter-value" data-target="500" data-suffix="+">0</div>
-              <div class="hero-stat-lbl">Clients Worldwide</div>
-            </div>
-            <div class="col-4">
-              <div class="hero-stat-num counter-value" data-target="98" data-suffix="%">0</div>
-              <div class="hero-stat-lbl">Success Rate</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6 fade-in-up" style="transition-delay:0.2s">
-        <div class="hero-img-wrap">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuA7GYmUTlnGlrduP3TNqtG34OIPJwSl8vNoWEvU97-fFrPZYk6nOtxasgMkwr4uV6evXuZ9A3p0F9v9e5PSSyi-9tgDR3cLqrQoIZiEWqUjICW5vkKckRDee9XBa665RRjSqc83wFbAlDNnIEnvC4p2poVtuvmsLl1-Vd1ew15SIb3Q46hSyxBSC-kAOiybQK4dh0RfyPw7bYiqh2LInO94Y2z9FuJFb93mL8An6Jjx9t0hdZBKiMR4fB-DrnXltC62YYlWWAD2YdFP" alt="Consultants collaborating"/>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
 
-<!-- ===== POTENTIAL / ABOUT ===== -->
-<section class="potential-section" id="potential">
-  <div class="container">
-    <div class="row align-items-center g-5">
-      <div class="col-lg-5 fade-in-up">
-        <div class="potential-img-wrap">
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBAUBUkzpJjDamcEAQygYRMoQNmYXcIe9VTs0xM6mMDC6S4syDXBfcRMW53NI1rzQf946m6yjgjfpFk5nvUBokLuscVv6rh9G5ARS7jgpfzW-EDcuWS2904y2CzB1ynS4aIRGYJP1nYbaUg_SUxj4UCKhX1s3VnajEtH9YoRgNiYTtFZ298fU0RNL5mpAI0r7Bi0jUR90nehwRqVh-DwYEJf5vY1VAWpFc7Q1SXWW1dvkOfP5dM_bT2lYwd5RWF4M8nx9rfb1Z8EVDK" alt="Team meeting"/>
-          <div class="experience-badge">
-            <div class="num counter-value" data-target="15" data-suffix="+">0</div>
-            <div class="lbl">Years of Experience</div>
+      <!-- STAT CARDS -->
+      <div class="stat-cards-row">
+        <div class="stat-card">
+          <div class="stat-icon-wrap icon-purple">
+            <i class="bi bi-eye-fill"></i>
+          </div>
+          <div class="stat-label">Profile Views</div>
+          <div class="stat-value counter-stat" data-target="190000">0</div>
+          <div class="stat-change up">
+            <i class="bi bi-arrow-up-short"></i> 12.4% this week
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap icon-cyan">
+            <i class="bi bi-people-fill"></i>
+          </div>
+          <div class="stat-label">Followers</div>
+          <div class="stat-value counter-stat" data-target="190000">0</div>
+          <div class="stat-change up">
+            <i class="bi bi-arrow-up-short"></i> 8.1% this week
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap icon-teal">
+            <i class="bi bi-person-check-fill"></i>
+          </div>
+          <div class="stat-label">Following</div>
+          <div class="stat-value counter-stat" data-target="190000">0</div>
+          <div class="stat-change down">
+            <i class="bi bi-arrow-down-short"></i> 2.3% this week
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon-wrap icon-coral">
+            <i class="bi bi-bookmark-fill"></i>
+          </div>
+          <div class="stat-label">Saved Posts</div>
+          <div class="stat-value counter-stat" data-target="190000">0</div>
+          <div class="stat-change up">
+            <i class="bi bi-arrow-up-short"></i> 5.7% this week
           </div>
         </div>
       </div>
-      <div class="col-lg-7 fade-in-up" style="transition-delay:0.15s">
-        <div class="ps-lg-4">
-          <span class="section-badge">About Us</span>
-          <h2 class="section-title mb-4">We Help Businesses Reach <br class="d-none d-xl-block"/> Their Full Potential</h2>
-          <p class="text-muted-sm mb-5" style="line-height:1.8;">
-            Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.
-          </p>
-          <div class="row g-4 mb-5">
-            <div class="col-sm-6">
-              <div class="feature-icon">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-              </div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Business Growth</h5>
-              <p class="text-muted-sm">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
-            </div>
-            <div class="col-sm-6">
-              <div class="feature-icon">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-              </div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Innovative Solutions</h5>
-              <p class="text-muted-sm">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
-            </div>
-            <div class="col-sm-6">
-              <div class="feature-icon">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-              </div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Expert Team</h5>
-              <p class="text-muted-sm">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
-            </div>
-            <div class="col-sm-6">
-              <div class="feature-icon">
-                <svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg>
-              </div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Proven Results</h5>
-              <p class="text-muted-sm">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</p>
-            </div>
-          </div>
-          <button class="btn-dark-brand">Learn More About Us</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
 
-<!-- ===== PROCESS ===== -->
-<section class="process-section" id="process">
-  <div class="container">
-    <div class="text-center mb-2">
-      <span class="section-badge">Our Consulting Process</span>
-    </div>
-    <h2 class="section-title text-center mb-5">Check Our Consulting Process</h2>
-    <div class="row align-items-center g-5">
-      <div class="col-lg-5 fade-in-up">
-        <h3 class="section-title mb-4" style="font-size:1.75rem;">Our Proven Consulting Process</h3>
-        <p class="text-muted-sm mb-3" style="line-height:1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Sed do eiusmod.</p>
-        <p class="text-muted-sm mb-5 fst-italic" style="line-height:1.8;">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa.</p>
-        <div class="d-flex flex-wrap gap-3">
-          <button class="btn-brand-primary">Start Your Project</button>
-          <button class="btn-brand-outline">Learn More</button>
-        </div>
-      </div>
-      <div class="col-lg-7 fade-in-up" style="transition-delay:0.15s">
-        <div class="d-flex flex-column gap-2">
-          <div class="process-step active" onclick="setActive(this)">
-            <div class="step-num">01</div>
-            <div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:0.35rem;">Discovery &amp; Analysis</h5>
-              <p class="text-muted-sm mb-0">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.</p>
-            </div>
-          </div>
-          <div class="process-step" onclick="setActive(this)">
-            <div class="step-num">02</div>
-            <div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:0.35rem;">Strategy Development</h5>
-              <p class="text-muted-sm mb-0">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.</p>
-            </div>
-          </div>
-          <div class="process-step" onclick="setActive(this)">
-            <div class="step-num">03</div>
-            <div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:0.35rem;">Implementation</h5>
-              <p class="text-muted-sm mb-0">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.</p>
-            </div>
-          </div>
-          <div class="process-step" onclick="setActive(this)">
-            <div class="step-num">04</div>
-            <div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:0.35rem;">Monitoring &amp; Optimization</h5>
-              <p class="text-muted-sm mb-0">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.</p>
-            </div>
-          </div>
-          <div class="process-step" onclick="setActive(this)">
-            <div class="step-num">05</div>
-            <div>
-              <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:0.35rem;">Evaluation &amp; Reporting</h5>
-              <p class="text-muted-sm mb-0">Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit, sed quia consequuntur magni dolores eos qui ratione.</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== SERVICES ===== -->
-<section class="services-section" id="services">
-  <div class="container">
-    <div class="text-center mb-2">
-      <span class="section-badge">Services</span>
-    </div>
-    <h2 class="section-title text-center mb-5">Check Our Service</h2>
-    <div class="row g-4">
-      <div class="col-md-6 col-lg-4 fade-in-up">
-        <div class="service-card">
-          <div class="service-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);font-size:1.3rem;margin-bottom:0.75rem;">Strategic Planning</h3>
-          <p class="text-muted-sm mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <ul class="bullet-list mb-4">
-            <li><span class="service-bullet"></span>Market Analysis</li>
-            <li><span class="service-bullet"></span>Competitive Research</li>
-            <li><span class="service-bullet"></span>Growth Strategy</li>
-          </ul>
-          <a href="#" class="service-link">Learn More →</a>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-in-up" style="transition-delay:0.1s">
-        <div class="service-card">
-          <div class="service-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);font-size:1.3rem;margin-bottom:0.75rem;">Business Transformation</h3>
-          <p class="text-muted-sm mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <ul class="bullet-list mb-4">
-            <li><span class="service-bullet"></span>Process Optimization</li>
-            <li><span class="service-bullet"></span>Digital Transformation</li>
-            <li><span class="service-bullet"></span>Culture Change</li>
-          </ul>
-          <a href="#" class="service-link">Learn More →</a>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-in-up" style="transition-delay:0.2s">
-        <div class="service-card">
-          <div class="service-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);font-size:1.3rem;margin-bottom:0.75rem;">Financial Advisory</h3>
-          <p class="text-muted-sm mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <ul class="bullet-list mb-4">
-            <li><span class="service-bullet"></span>Financial Analysis</li>
-            <li><span class="service-bullet"></span>Investment Planning</li>
-            <li><span class="service-bullet"></span>Risk Management</li>
-          </ul>
-          <a href="#" class="service-link">Learn More →</a>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-in-up" style="transition-delay:0.05s">
-        <div class="service-card">
-          <div class="service-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);font-size:1.3rem;margin-bottom:0.75rem;">Human Resources</h3>
-          <p class="text-muted-sm mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <ul class="bullet-list mb-4">
-            <li><span class="service-bullet"></span>Talent Acquisition</li>
-            <li><span class="service-bullet"></span>Performance Management</li>
-            <li><span class="service-bullet"></span>Leadership Development</li>
-          </ul>
-          <a href="#" class="service-link">Learn More →</a>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-in-up" style="transition-delay:0.15s">
-        <div class="service-card">
-          <div class="service-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9.75 17L9 21h6l-.75-4M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);font-size:1.3rem;margin-bottom:0.75rem;">Technology Consulting</h3>
-          <p class="text-muted-sm mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <ul class="bullet-list mb-4">
-            <li><span class="service-bullet"></span>IT Strategy</li>
-            <li><span class="service-bullet"></span>System Implementation</li>
-            <li><span class="service-bullet"></span>Cybersecurity</li>
-          </ul>
-          <a href="#" class="service-link">Learn More →</a>
-        </div>
-      </div>
-      <div class="col-md-6 col-lg-4 fade-in-up" style="transition-delay:0.25s">
-        <div class="service-card">
-          <div class="service-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M11 5.882V19.24a1.76 1.76 0 01-3.417.592l-2.147-6.167a1.13 1.13 0 01.827-1.468l1.597-.469V5.882a2.353 2.353 0 014.706 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);font-size:1.3rem;margin-bottom:0.75rem;">Marketing Strategy</h3>
-          <p class="text-muted-sm mb-4">Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <ul class="bullet-list mb-4">
-            <li><span class="service-bullet"></span>Brand Development</li>
-            <li><span class="service-bullet"></span>Digital Marketing</li>
-            <li><span class="service-bullet"></span>Market Research</li>
-          </ul>
-          <a href="#" class="service-link">Learn More →</a>
-        </div>
-      </div>
-    </div>
-    <div class="text-center mt-5">
-      <button class="btn-brand-primary" style="padding:1rem 2.5rem;font-size:1rem;">Request a Consultation</button>
-    </div>
-  </div>
-</section>
-
-<!-- ===== CONSULTATION FORM ===== -->
-<section class="consultation-section" id="consultation">
-  <div class="container">
-    <div class="consultation-box">
-      <div class="row g-5 align-items-start">
-        <div class="col-lg-6 fade-in-up">
-          <span class="section-badge">Our Consulting Process</span>
-          <h2 class="section-title mb-3">Schedule a Consultation</h2>
-          <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:1.25rem;">Ready to Transform Your Business?</h3>
-          <p class="text-muted-sm mb-5" style="line-height:1.8;">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo.</p>
-          <div class="d-flex gap-4 flex-wrap">
-            <div>
-              <div class="counter-value" style="font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;color:var(--brand-dark);" data-target="500" data-suffix="+">0</div>
-              <div style="font-size:0.7rem;color:var(--gray-400);">Projects Completed</div>
-            </div>
-            <div>
-              <div class="counter-value" style="font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;color:var(--brand-dark);" data-target="98" data-suffix="%">0</div>
-              <div style="font-size:0.7rem;color:var(--gray-400);">Client Satisfaction</div>
-            </div>
-            <div>
-              <div class="counter-value" style="font-family:'Syne',sans-serif;font-size:1.75rem;font-weight:800;color:var(--brand-dark);" data-target="15" data-suffix="+">0</div>
-              <div style="font-size:0.7rem;color:var(--gray-400);">Years Experience</div>
-            </div>
-          </div>
-        </div>
-        <div class="col-lg-6 fade-in-up" style="transition-delay:0.15s">
-          <div style="background:var(--brand-light);border-radius:14px;padding:2rem;">
-            <h4 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:0.5rem;">Schedule a Free Consultation</h4>
-            <p class="text-muted-sm mb-4">Fill out the form below and our team will contact you.</p>
-            <div class="d-flex flex-column gap-3">
-              <input class="form-control-brand" type="text" placeholder="Full Name"/>
-              <input class="form-control-brand" type="email" placeholder="Email Address"/>
-              <input class="form-control-brand" type="tel" placeholder="Phone Number"/>
-              <textarea class="form-control-brand" rows="4" placeholder="Message" style="resize:vertical;"></textarea>
-              <button class="btn-brand-primary w-100" style="padding:1rem;">Get Started</button>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== WHY CHOOSE US ===== -->
-<section class="why-section" id="why">
-  <div class="container">
-    <div class="text-center mb-2">
-      <span class="section-badge">Why Choose Us</span>
-    </div>
-    <h2 class="section-title text-center mb-5">Why Choose Our Services</h2>
-    <div class="row align-items-center g-5">
-      <div class="col-lg-6 fade-in-up">
-        <h3 class="section-title mb-4" style="font-size:1.75rem;">Why Choose Our Consulting Services</h3>
-        <p class="text-muted-sm mb-3" style="line-height:1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo.</p>
-        <p class="text-muted-sm fst-italic mb-5" style="line-height:1.8;">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam.</p>
-        <div class="row g-4">
-          <div class="col-6">
-            <div class="d-flex gap-3 align-items-start">
-              <div class="why-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-              <div><h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Data-Driven</h6><p class="mb-0" style="font-size:0.75rem;color:var(--gray-500);">Approach built on real insights.</p></div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="d-flex gap-3 align-items-start">
-              <div class="why-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 14l9-5-9-5-9 5 9 5zm0 0l9-5-9-5-9 5 9 5zm0 0v6" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-              <div><h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Industry Expertise</h6><p class="mb-0" style="font-size:0.75rem;color:var(--gray-500);">Deep sector knowledge across industries.</p></div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="d-flex gap-3 align-items-start">
-              <div class="why-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-              <div><h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Timely Delivery</h6><p class="mb-0" style="font-size:0.75rem;color:var(--gray-500);">On-schedule projects, always.</p></div>
-            </div>
-          </div>
-          <div class="col-6">
-            <div class="d-flex gap-3 align-items-start">
-              <div class="why-feature-icon"><svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138z" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/></svg></div>
-              <div><h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Guaranteed Results</h6><p class="mb-0" style="font-size:0.75rem;color:var(--gray-500);">Measurable outcomes, guaranteed.</p></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-6 fade-in-up" style="transition-delay:0.15s">
-        <div class="why-img-wrap">
-          <div class="why-stats-grid">
-            <div class="why-stat-box"><div class="num counter-value" data-target="95" data-suffix="+">0</div><div class="lbl">Satisfied Clients</div></div>
-            <div class="why-stat-box"><div class="num counter-value" data-target="250" data-suffix="+">0</div><div class="lbl">Expert Consultants</div></div>
-            <div class="why-stat-box"><div class="num counter-value" data-target="30" data-suffix="+">0</div><div class="lbl">Success Awards</div></div>
-            <div class="why-stat-box"><div class="num counter-value" data-target="20" data-suffix="+">0</div><div class="lbl">Global Offices</div></div>
-          </div>
-          <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAa3cnWztiXbboDtEBfU8vmt8slFLcBIj2RY3L7GQfXmQTODWkgwi9FC3UynT2_vWWujbXQ_yiTKlPA5lXJ4cTWUUZOoId_-u6sT1Si4IR4Fn5l2AV7WVG0mNZdiArbqQ39PfKGlv57neQFD04W8n23qww539EJx1N7Wlh81qoR9XFKq-HykT9ifJ1E0NB9BFobWKQuxjcWJX8KJTmgmcsZHSTcBGx0wdNAv0CsTBYrlbBBcLUxsdontJCr3ryALFRGJ_68AVFYtln-" alt="Work collaboration"/>
-          <div class="exp-badge-why">
-            <div class="num">15+</div>
-            <div style="font-size:0.75rem;">Years Experience</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== TEAM ===== -->
-<section class="team-section" id="team">
-  <div class="container">
-    <div class="text-center mb-2">
-      <span class="section-badge">Our Team</span>
-    </div>
-    <h2 class="section-title text-center mb-5">Check Our Expert Team</h2>
-    <div class="team-slider-outer mb-4">
-      <div class="team-slider-track" id="teamTrack">
-        <div class="team-slide" style="width:25%;">
-          <div class="team-card">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgD7sp7y-yw8QenSjpXPSJQwBa0C9P6y_7MTttfZTNr0mpsiG2BQTs2BrxVbP-7JhX9gddyEXDVQsgoEG1wFMJXr6puDE8aR3G8r6zCx3Hn48H5I1Si0kw0qU0E_torf_c7EY-MitKUe-8B0wFAR_xWmOUuTnW7t_q2vi6BkjIOXAIVliPUaPyiStBUZfx6eSxY82BghLnDfqVfeTQlCzp3eLS4eUsSlZTZ2jDlmVGIC-ewcBBUwa2K64Vhb4uTOJT7jAjdvThyCH2" alt="Christiana A."/>
-            <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Christiana A.</h5>
-            <p class="text-brand mb-3" style="font-size:0.75rem;font-weight:600;">Founder</p>
-            <div class="d-flex justify-content-center gap-2">
-              <a href="#" class="team-social-btn"><i class="bi bi-twitter-x"></i></a>
-              <a href="#" class="team-social-btn"><i class="bi bi-linkedin"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="team-slide" style="width:25%;">
-          <div class="team-card">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuApk5asXHRuNBLh_gm2mltF_t3IxodlOw42axWxRfO2Vx6Gz_3ddPZjJnf819Yw0ULANILsEf5y5GeQRqgdJN34HjxMZQXwS8Rt2rhNSib4gBZM4sz6sjt_T013t5L2lDG6hlLrnPvF7nULj5UT9yCpSsB9pduM_GIZNNMo7smsaeZiTmbbBPO11_JVIJilHRGG2o3KCVrOZvF6E8MHOCXC-ncP2fo9o1FBwcNCdfABVMcyl7kr4tymvoUdXVtbkrE83w7LlEMJcSgh" alt="Thomas P."/>
-            <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Thomas P.</h5>
-            <p class="text-brand mb-3" style="font-size:0.75rem;font-weight:600;">Sales Officer</p>
-            <div class="d-flex justify-content-center gap-2">
-              <a href="#" class="team-social-btn"><i class="bi bi-twitter-x"></i></a>
-              <a href="#" class="team-social-btn"><i class="bi bi-linkedin"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="team-slide" style="width:25%;">
-          <div class="team-card">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuCcCNKeKyGNa72tSTlbI--qvg5VVVW7fK68YfiKYr2_LkeUOz9L986i_MAZgHFTNPJ30kNGwjeGJlDXARkqo3vrLpOVeqrC34oXjqmXoK_G4wSxTnab-tHeRSzW_xu2offHoc5WvdvEl5HWwVifHyJvzJYin6dQeMCYG3BCEiaH6Hh-0GRBa0ZJPZagmnBEgXB21tZKPELEnbydt4nf2zYpn-UwBNFT2VkK2j27dKputYpMvHejpyM4XU4_AOE0NXkVVMlOzEWuHKk7" alt="Emmanuel J."/>
-            <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Emmanuel J.</h5>
-            <p class="text-brand mb-3" style="font-size:0.75rem;font-weight:600;">Lead Designer</p>
-            <div class="d-flex justify-content-center gap-2">
-              <a href="#" class="team-social-btn"><i class="bi bi-twitter-x"></i></a>
-              <a href="#" class="team-social-btn"><i class="bi bi-linkedin"></i></a>
-            </div>
-          </div>
-        </div>
-        <div class="team-slide" style="width:25%;">
-          <div class="team-card">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAIh2TzCdZS0A1ErKXau_N6zi75CGLN8h_98G1RQN4YyJfVctegyTpepKz1erFHiPiLP_2VMKGfA_Kr8wY_6BATLrqnRFK3dk80IygrMv4PDmQxG4hDcuA34E5vtEysWOjQWjoex3fP1TFkvuZtRC_u7bQzZd-iJgf5Q9beXZc78abpYpCzLtNPMnI3wHA3iwo2qbg1BUKmdqzLGBfjMtqlGlVYZPZR7mZVrc2UAykX6FaT69CtFoSkEw3QrJAXg8WWlRq_ja2zMWIm" alt="Olivea James"/>
-            <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Olivea James</h5>
-            <p class="text-brand mb-3" style="font-size:0.75rem;font-weight:600;">Full Stack Engineer</p>
-            <div class="d-flex justify-content-center gap-2">
-              <a href="#" class="team-social-btn"><i class="bi bi-twitter-x"></i></a>
-              <a href="#" class="team-social-btn"><i class="bi bi-linkedin"></i></a>
-            </div>
-          </div>
-        </div>
-        <!-- duplicate for infinite feel -->
-        <div class="team-slide" style="width:25%;">
-          <div class="team-card">
-            <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDgD7sp7y-yw8QenSjpXPSJQwBa0C9P6y_7MTttfZTNr0mpsiG2BQTs2BrxVbP-7JhX9gddyEXDVQsgoEG1wFMJXr6puDE8aR3G8r6zCx3Hn48H5I1Si0kw0qU0E_torf_c7EY-MitKUe-8B0wFAR_xWmOUuTnW7t_q2vi6BkjIOXAIVliPUaPyiStBUZfx6eSxY82BghLnDfqVfeTQlCzp3eLS4eUsSlZTZ2jDlmVGIC-ewcBBUwa2K64Vhb4uTOJT7jAjdvThyCH2" alt="Christiana A."/>
-            <h5 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Christiana A.</h5>
-            <p class="text-brand mb-3" style="font-size:0.75rem;font-weight:600;">Founder</p>
-            <div class="d-flex justify-content-center gap-2">
-              <a href="#" class="team-social-btn"><i class="bi bi-twitter-x"></i></a>
-              <a href="#" class="team-social-btn"><i class="bi bi-linkedin"></i></a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="d-flex justify-content-center align-items-center gap-3">
-      <button class="slider-btn" id="teamPrev"><i class="bi bi-chevron-left"></i></button>
-      <div id="teamDots">
-        <span class="slider-dot active"></span>
-        <span class="slider-dot"></span>
-        <span class="slider-dot"></span>
-        <span class="slider-dot"></span>
-      </div>
-      <button class="slider-btn" id="teamNext"><i class="bi bi-chevron-right"></i></button>
-    </div>
-  </div>
-</section>
-
-<!-- ===== TESTIMONIALS ===== -->
-<section class="testimonials-section" id="testimonials">
-  <div class="container">
-    <div class="text-center mb-2">
-      <span class="section-badge">Our Testimonials</span>
-    </div>
-    <h2 class="section-title text-center mb-5">Check Our Testimonials</h2>
-    <div class="row g-4">
-      <div class="col-md-6 fade-in-up">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <p class="text-muted-sm mb-4" style="line-height:1.8;">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Sed do eiusmod."</p>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDPWZ3t5s80JqtLw2lfvOrAKuuEUZq2JXYm22DBuegb63ZKHzURIxKWeWWb3kM9fUvbGJIOjABvSiVHhsHjBAXNYlzqcg_bNLyJuqEX9RVKL1vXBKmv1arYr-zE2YiFbms6zvK1QFDb60yL0KEdK2GRSAhLiqsNtcy1Q-i97nOfZP_l91FD4jlInb8cZVtJrhVj6Zs0DqtN4hHrKNrTyWRRKHdAQQR_oYDn0fBAjUbXXXI5866lmDs9A33QcaI_dyX8nkb_Z38P57nE" alt="Thomas P." style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/>
-              <div><h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin:0;">Thomas P.</h6><small class="text-muted" style="font-size:0.7rem;">Sales Officer</small></div>
-            </div>
-            <div class="quote-icon"><svg class="w-10 h-10" fill="currentColor" style="width:36px;height:36px;" viewBox="0 0 24 24"><path d="M14.017 21v-3c0-1.105.895-2 2-2h2v-2h-2c-1.657 0-3-1.343-3-3V8c0-1.657 1.343-3 3-3h2V3h-2c-2.761 0-5 2.239-5 5v3v5.382C11.017 18.933 13.017 21 13.017 21zm-9 0v-3c0-1.105.895-2 2-2h2v-2h-2c-1.657 0-3-1.343-3-3V8c0-1.657 1.343-3 3-3h2V3h-2c-2.761 0-5 2.239-5 5v3v5.382C2.017 18.933 4.017 21 4.017 21z"/></svg></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 fade-in-up" style="transition-delay:0.1s">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <p class="text-muted-sm mb-4" style="line-height:1.8;">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Sed do eiusmod."</p>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTYAvZMAqqq8p_a-jbAT5Ck4aRsr80cOKTKSh5LAIocGTHoM9LV3Q0vKcPqxZY_AGTFroqJtfVqTPUhYKROQRI43HWDp96i1qGpeI8gp-ZQTonFdAbk1BECZSno-papsjaiqPaaBxoGf9IllhBbJhcDXPmPWUsZrXxhsP3CjLS0DxluaU-zyKxTBln1QWfwbSuNSLB1G_d9ubmB4ejm4HX6VDoGHwZScYqN4IZC09l1Qji8t3qmgC_Rty4Psi18nSbvYChXuoImd4C" alt="Christiana A." style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/>
-              <div><h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin:0;">Christiana A.</h6><small class="text-muted" style="font-size:0.7rem;">Founder</small></div>
-            </div>
-            <div class="quote-icon"><svg fill="currentColor" style="width:36px;height:36px;" viewBox="0 0 24 24"><path d="M14.017 21v-3c0-1.105.895-2 2-2h2v-2h-2c-1.657 0-3-1.343-3-3V8c0-1.657 1.343-3 3-3h2V3h-2c-2.761 0-5 2.239-5 5v3v5.382C11.017 18.933 13.017 21 13.017 21zm-9 0v-3c0-1.105.895-2 2-2h2v-2h-2c-1.657 0-3-1.343-3-3V8c0-1.657 1.343-3 3-3h2V3h-2c-2.761 0-5 2.239-5 5v3v5.382C2.017 18.933 4.017 21 4.017 21z"/></svg></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 fade-in-up" style="transition-delay:0.15s">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <p class="text-muted-sm mb-4" style="line-height:1.8;">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Sed do eiusmod."</p>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuBgCmyFT0g1CmXf5RoLn16zEzgKaOdZ8YbdBkmBhXuWG79d2s7ri6SbG22Dgx5hcSvs8-zHxQrvcgxE72clhQ6sKncghUSsBmCnf_V8JmMG8HcyjfH0rfTdXnR6dJO3rR2mfqj1mcX5xKq_B-TraDKIRyY26JcwkkgGSn9C69m9GF1Fz1GAnlLwf8nZvZPraxkGXBXrts0JyInU02wYoDBPSf3k16U_UV6EZoUVNzmCAcIelyErU9Eb8ou5Db2bSdQSr6z-G8H0kRFk" alt="Olivea James" style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/>
-              <div><h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin:0;">Olivea James</h6><small class="text-muted" style="font-size:0.7rem;">Full Stack Engineer</small></div>
-            </div>
-            <div class="quote-icon"><svg fill="currentColor" style="width:36px;height:36px;" viewBox="0 0 24 24"><path d="M14.017 21v-3c0-1.105.895-2 2-2h2v-2h-2c-1.657 0-3-1.343-3-3V8c0-1.657 1.343-3 3-3h2V3h-2c-2.761 0-5 2.239-5 5v3v5.382C11.017 18.933 13.017 21 13.017 21zm-9 0v-3c0-1.105.895-2 2-2h2v-2h-2c-1.657 0-3-1.343-3-3V8c0-1.657 1.343-3 3-3h2V3h-2c-2.761 0-5 2.239-5 5v3v5.382C2.017 18.933 4.017 21 4.017 21z"/></svg></div>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-6 fade-in-up" style="transition-delay:0.2s">
-        <div class="testimonial-card">
-          <div class="stars">★★★★★</div>
-          <p class="text-muted-sm mb-4" style="line-height:1.8;">"Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Sed do eiusmod."</p>
-          <div class="d-flex justify-content-between align-items-center">
-            <div class="d-flex align-items-center gap-3">
-              <img src="https://lh3.googleusercontent.com/aida-public/AB6AXuAJTbusBorSnWMi2LVMZspg7l6fldfG9lEsmMPTrM72XPsSD1R_RSSdBfLaWWr4ZycZoIv2VbXNJkllwbpxXgCLDMXoNLc0QJqD0z_vRTB2g7pluQ9doc9hPBOP4kvsMzKIabjOaicRj5FMMpVxSFoeIponiHfo1yWnR6TfCQ0KUAhPnhCeKBk9LHv9LzaJQQiiOHYZcetuLOupkY4kp8vVKbqpYgrYqbkzQw3NlmPI3Qz6c7bUtzGeRU8JRs01DUKsYNqQrF3l5XW7" alt="Emmanuel J." style="width:48px;height:48px;border-radius:50%;object-fit:cover;"/>
-              <div><h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin:0;">Emmanuel J.</h6><small class="text-muted" style="font-size:0.7rem;">Lead Designer</small></div>
-            </div>
-            <div class="quote-icon"><svg fill="currentColor" style="width:36px;height:36px;" viewBox="0 0 24 24"><path d="M14.017 21v-3c0-1.105.895-2 2-2h2v-2h-2c-1.657 0-3-1.343-3-3V8c0-1.657 1.343-3 3-3h2V3h-2c-2.761 0-5 2.239-5 5v3v5.382C11.017 18.933 13.017 21 13.017 21zm-9 0v-3c0-1.105.895-2 2-2h2v-2h-2c-1.657 0-3-1.343-3-3V8c0-1.657 1.343-3 3-3h2V3h-2c-2.761 0-5 2.239-5 5v3v5.382C2.017 18.933 4.017 21 4.017 21z"/></svg></div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== PRICING ===== -->
-<section class="pricing-section" id="pricing">
-  <div class="container">
-    <div class="text-center mb-2">
-      <span class="section-badge">Our Pricing Plan</span>
-    </div>
-    <h2 class="section-title text-center mb-4">Check Our Pricing Plan</h2>
-    <div class="d-flex justify-content-center align-items-center gap-3 mb-5">
-      <span style="font-size:0.875rem;font-weight:600;color:var(--brand-dark);">Monthly</span>
-      <div class="toggle-switch monthly" id="pricingToggle" onclick="this.classList.toggle('monthly')"></div>
-      <span style="font-size:0.875rem;font-weight:600;color:var(--brand-dark);">Yearly</span>
-      <span class="save-badge">Save 20%</span>
-    </div>
-    <div class="row g-4 align-items-stretch">
-      <div class="col-md-4 fade-in-up">
-        <div class="pricing-card">
-          <h4 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:1.25rem;">Basic Plan</h4>
-          <div class="mb-3"><span class="pricing-price">$1,499</span><span style="color:var(--gray-400);font-size:0.875rem;">/mo</span></div>
-          <p style="font-size:0.75rem;color:var(--gray-400);margin-bottom:1.5rem;">Perfect for small businesses</p>
-          <ul class="text-start mb-5" style="list-style:none;padding:0;font-size:0.875rem;color:var(--gray-600);">
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Business Analysis</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Strategic Planning</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Monthly Report</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-x-circle-fill" style="color:#fca5a5;"></i> Market Research</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-x-circle-fill" style="color:#fca5a5;"></i> Implementation Support</li>
-            <li class="d-flex align-items-center gap-2"><i class="bi bi-x-circle-fill" style="color:#fca5a5;"></i> Dedicated Consultant</li>
-          </ul>
-          <button class="btn-brand-outline w-100" style="padding:0.9rem;">Get Started</button>
-        </div>
-      </div>
-      <div class="col-md-4 fade-in-up" style="transition-delay:0.1s">
-        <div class="pricing-card featured">
-          <div class="pricing-badge">Most Popular</div>
-          <h4 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:1.25rem;">Professional Plan</h4>
-          <div class="mb-3"><span class="pricing-price">$2,499</span><span style="color:var(--gray-400);font-size:0.875rem;">/mo</span></div>
-          <p style="font-size:0.75rem;color:var(--gray-400);margin-bottom:1.5rem;">Perfect for growing startups</p>
-          <ul class="text-start mb-5" style="list-style:none;padding:0;font-size:0.875rem;color:var(--gray-600);">
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Business Analysis</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Strategic Planning</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Monthly Report</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Market Research</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Implementation Support</li>
-            <li class="d-flex align-items-center gap-2"><i class="bi bi-x-circle-fill" style="color:#fca5a5;"></i> Dedicated Consultant</li>
-          </ul>
-          <button class="btn-brand-primary w-100" style="padding:0.9rem;">Get Started</button>
-        </div>
-      </div>
-      <div class="col-md-4 fade-in-up" style="transition-delay:0.2s">
-        <div class="pricing-card">
-          <h4 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:1.25rem;">Enterprise Plan</h4>
-          <div class="mb-3"><span class="pricing-price">$4,999</span><span style="color:var(--gray-400);font-size:0.875rem;">/mo</span></div>
-          <p style="font-size:0.75rem;color:var(--gray-400);margin-bottom:1.5rem;">Perfect for large enterprises</p>
-          <ul class="text-start mb-5" style="list-style:none;padding:0;font-size:0.875rem;color:var(--gray-600);">
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Business Analysis</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Strategic Planning</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Monthly Report</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Market Research</li>
-            <li class="mb-3 d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Implementation Support</li>
-            <li class="d-flex align-items-center gap-2"><i class="bi bi-check-circle-fill text-brand"></i> Dedicated Consultant</li>
-          </ul>
-          <button class="btn-brand-outline w-100" style="padding:0.9rem;">Get Started</button>
-        </div>
-      </div>
-    </div>
-    <p class="text-center mt-5" style="color:var(--gray-400);font-size:0.875rem;">Need a custom solution? <a href="#contact" style="color:var(--brand-primary);text-decoration:underline;">Contact us</a> for a personalized quote.</p>
-  </div>
-</section>
-
-<!-- ===== FAQ ===== -->
-<section class="faq-section" id="faq">
-  <div class="container">
-    <div class="text-center mb-2">
-      <span class="section-badge">Frequently Asked Questions</span>
-    </div>
-    <h2 class="section-title text-center mb-5">Frequently Asked Questions</h2>
-    <div class="row g-5">
-      <div class="col-lg-7">
-        <div class="accordion accordion-brand" id="faqAccordion">
-          <div class="accordion-item">
-            <h2 class="accordion-header"><button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">Vivamus suscipit eget felis porttitor volutpat</button></h2>
-            <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">Sed ut perspiciatis unde omnis iste natus error sit voluptatem accusantium doloremque laudantium, totam rem aperiam, eaque ipsa quae ab illo inventore veritatis.</div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">Lorem ipsum dolor sit amet, consectetur adipiscing elit</button></h2>
-            <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">Answer text goes here. Sed ut perspiciatis unde omnis iste natus error sit voluptatem.</div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo</button></h2>
-            <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">Answer text goes here. Nemo enim ipsam voluptatem quia voluptas sit aspernatur aut odit aut fugit.</div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">Lorem ipsum dolor sit amet, consectetur adipiscing elit</button></h2>
-            <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">Answer text goes here. Lorem ipsum dolor sit amet consectetur adipiscing elit sed do eiusmod.</div>
-            </div>
-          </div>
-          <div class="accordion-item">
-            <h2 class="accordion-header"><button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo</button></h2>
-            <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
-              <div class="accordion-body">Answer text goes here. Ut enim ad minim veniam quis nostrud exercitation ullamco laboris.</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="col-lg-5">
-        <div class="faq-cta">
-          <div class="faq-cta-icon"><i class="bi bi-chat-dots-fill"></i></div>
-          <p class="text-muted-sm mb-5" style="line-height:1.8;">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut elit tellus, luctus nec ullamcorper mattis, pulvinar dapibus leo. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.</p>
-          <button class="btn-brand-primary" style="padding:1rem 2.5rem;">Get Started</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== CONTACT ===== -->
-<section class="contact-section" id="contact">
-  <div class="container">
-    <div class="text-center mb-2">
-      <span class="section-badge">Contacts</span>
-    </div>
-    <h2 class="section-title text-center mb-5">Contact Us</h2>
-    <div class="row g-5">
-      <div class="col-lg-5 fade-in-up">
-        <h3 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);margin-bottom:1rem;">Contact Information</h3>
-        <p class="text-muted-sm mb-5">Feel free to reach out with any questions about our services, speaking engagements, or media inquiries.</p>
-        <div class="d-flex flex-column gap-4 mb-5">
-          <div class="d-flex align-items-center gap-4">
-            <div class="contact-icon-wrap"><i class="bi bi-envelope"></i></div>
-            <div><strong style="color:var(--brand-dark);display:block;">Email</strong><span class="text-muted-sm">info@consulting.com</span></div>
-          </div>
-          <div class="d-flex align-items-center gap-4">
-            <div class="contact-icon-wrap"><i class="bi bi-telephone"></i></div>
-            <div><strong style="color:var(--brand-dark);display:block;">Phone</strong><span class="text-muted-sm">+1 234 567 890</span></div>
-          </div>
-          <div class="d-flex align-items-center gap-4">
-            <div class="contact-icon-wrap"><i class="bi bi-geo-alt"></i></div>
-            <div><strong style="color:var(--brand-dark);display:block;">Address</strong><span class="text-muted-sm">123 Street Name, Avenue City,<br/>Woodward HQ, NY 10010</span></div>
-          </div>
-        </div>
-        <div class="d-flex gap-3">
-          <a href="#" class="social-btn"><i class="bi bi-facebook"></i></a>
-          <a href="#" class="social-btn"><i class="bi bi-twitter-x"></i></a>
-          <a href="#" class="social-btn"><i class="bi bi-linkedin"></i></a>
-          <a href="#" class="social-btn"><i class="bi bi-instagram"></i></a>
-        </div>
-      </div>
-      <div class="col-lg-7 fade-in-up" style="transition-delay:0.15s">
-        <div class="contact-form-card">
-          <div class="row g-4 mb-4">
-            <div class="col-sm-6">
-              <label class="form-label-brand">Your Name</label>
-              <input type="text" class="form-control-brand"/>
-            </div>
-            <div class="col-sm-6">
-              <label class="form-label-brand">Your Email</label>
-              <input type="email" class="form-control-brand"/>
-            </div>
-          </div>
-          <div class="mb-4">
-            <label class="form-label-brand">Subject</label>
-            <input type="text" class="form-control-brand"/>
-          </div>
-          <div class="mb-5">
-            <label class="form-label-brand">Message</label>
-            <textarea class="form-control-brand" rows="6" style="resize:vertical;"></textarea>
-          </div>
-          <button class="btn-brand-primary" style="padding:0.9rem 2.5rem;">Send Message</button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- ===== FOOTER ===== -->
-<footer class="main-footer">
-  <div class="container">
-    <div class="row g-5 pb-4" style="border-bottom:1px solid var(--gray-200);">
-      <div class="col-md-4">
-        <div class="d-flex gap-3">
-          <i class="bi bi-geo-alt footer-info-icon"></i>
+      <!-- PROFILE & ACTIVE CLIENTS (right column) -->
+      <div class="profile-col">
+        <!-- Profile Card -->
+        <div class="profile-card">
+          <div class="profile-avatar-placeholder">AA</div>
           <div>
-            <h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Address</h6>
-            <p class="text-muted-sm mb-0">123 Street Name, Avenue City,<br/>Woodward HQ, NY 10010</p>
+            <p class="profile-name">Alex Ariyo</p>
+            <p class="profile-handle">@techuncle</p>
           </div>
         </div>
-      </div>
-      <div class="col-md-4">
-        <div class="d-flex gap-3">
-          <i class="bi bi-telephone footer-info-icon"></i>
-          <div>
-            <h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Contacts</h6>
-            <p class="text-muted-sm mb-0">Phone: +1 234 567 890<br/>Email: info@consulting.com</p>
-          </div>
-        </div>
-      </div>
-      <div class="col-md-4">
-        <div class="d-flex gap-3">
-          <i class="bi bi-clock footer-info-icon"></i>
-          <div>
-            <h6 style="font-family:'Syne',sans-serif;font-weight:700;color:var(--brand-dark);">Opening Hours</h6>
-            <p class="text-muted-sm mb-0">Mon – Sat: 11:00 – 23:00<br/>Sunday: Closed</p>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="d-flex flex-column flex-md-row justify-content-between align-items-center mt-4 gap-3">
-      <div class="d-flex gap-3">
-        <a href="#" class="social-btn" style="width:32px;height:32px;font-size:0.75rem;"><i class="bi bi-facebook"></i></a>
-        <a href="#" class="social-btn" style="width:32px;height:32px;font-size:0.75rem;"><i class="bi bi-twitter-x"></i></a>
-        <a href="#" class="social-btn" style="width:32px;height:32px;font-size:0.75rem;"><i class="bi bi-linkedin"></i></a>
-        <a href="#" class="social-btn" style="width:32px;height:32px;font-size:0.75rem;"><i class="bi bi-instagram"></i></a>
-      </div>
-      <p class="text-muted-sm mb-0">© Copyright Consulting. All Rights Reserved</p>
-    </div>
-  </div>
-</footer>
 
-<!-- ===== BACK TO TOP ===== -->
-<button id="backToTop" aria-label="Back to top">
-  <svg class="progress-ring" viewBox="0 0 52 52">
-    <circle cx="26" cy="26" r="22" id="progressCircle"/>
-  </svg>
-  <i class="bi bi-arrow-up" style="position:relative;z-index:1;"></i>
-</button>
+        <!-- Active Clients -->
+        <div class="active-clients-card">
+          <div class="active-clients-title">Active Clients</div>
 
-<!-- Bootstrap 5 JS -->
+          <div class="client-item">
+            <div class="client-avatar-placeholder" style="background:linear-gradient(135deg,#f97316,#ef4444);">OD</div>
+            <div>
+              <p class="client-name">Olaoye Damilola</p>
+              <p class="client-role">Product Manager</p>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+
+          <div class="client-item">
+            <div class="client-avatar-placeholder" style="background:linear-gradient(135deg,#038b8c,#014d4e);">JD</div>
+            <div>
+              <p class="client-name">John Doe</p>
+              <p class="client-role">Lead Developer</p>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+
+          <div class="client-item">
+            <div class="client-avatar-placeholder" style="background:linear-gradient(135deg,#f59e0b,#d97706);">OS</div>
+            <div>
+              <p class="client-name">Olawale Seyi</p>
+              <p class="client-role">UI Designer</p>
+            </div>
+            <div class="online-dot" style="background:#9ca3af;box-shadow:none;"></div>
+          </div>
+
+          <div class="client-item">
+            <div class="client-avatar-placeholder" style="background:linear-gradient(135deg,#8b5cf6,#6d28d9);">TY</div>
+            <div>
+              <p class="client-name">Tinubu Yaya</p>
+              <p class="client-role">Business Analyst</p>
+            </div>
+            <div class="online-dot"></div>
+          </div>
+
+          <button class="view-all-btn">View all Clients</button>
+        </div>
+      </div>
+
+      <!-- CHART -->
+      <div class="chart-card">
+        <div class="chart-header">
+          <h3 class="chart-title">Client's Visit</h3>
+          <div class="chart-period-btns">
+            <button class="period-btn" onclick="updateChart('week',this)">Week</button>
+            <button class="period-btn active" onclick="updateChart('month',this)">Month</button>
+            <button class="period-btn" onclick="updateChart('year',this)">Year</button>
+          </div>
+        </div>
+        <div class="chart-wrap">
+          <canvas id="visitChart"></canvas>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="dashboard-footer">
+      © 2026 Consulting Admin. All rights reserved.
+    </footer>
+
+  </div><!-- /main-content -->
+</div><!-- /dashboard-shell -->
+
+<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-// ===== PAGE LOADER =====
-window.addEventListener('load', () => {
-  setTimeout(() => {
-    document.getElementById('page-loader').classList.add('hidden');
-  }, 900);
-});
+// ===== MOBILE SIDEBAR =====
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+const mobileToggle = document.getElementById('mobileToggle');
 
-// ===== MOBILE MENU =====
-const menuOverlay = document.getElementById('menuOverlay');
-document.getElementById('menuOpenBtn').addEventListener('click', () => {
-  menuOverlay.classList.add('open');
-  document.body.style.overflow = 'hidden';
+mobileToggle.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
 });
-document.getElementById('menuCloseBtn').addEventListener('click', () => {
-  menuOverlay.classList.remove('open');
-  document.body.style.overflow = '';
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
 });
-menuOverlay.querySelectorAll('nav a').forEach(a => {
-  a.addEventListener('click', () => {
-    menuOverlay.classList.remove('open');
-    document.body.style.overflow = '';
+// Close on nav link click (mobile)
+sidebar.querySelectorAll('.nav-item-link').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth < 992) {
+      sidebar.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+    // Active state
+    sidebar.querySelectorAll('.nav-item-link').forEach(l => l.classList.remove('active'));
+    link.classList.add('active');
   });
 });
-
-// ===== PROCESS STEP ACTIVE =====
-function setActive(el) {
-  document.querySelectorAll('.process-step').forEach(s => s.classList.remove('active'));
-  el.classList.add('active');
-}
-
-// ===== SCROLL ANIMATIONS (fade-in-up) =====
-const fio = new IntersectionObserver((entries) => {
-  entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
-}, { threshold: 0.12 });
-document.querySelectorAll('.fade-in-up').forEach(el => fio.observe(el));
 
 // ===== COUNTER ANIMATION =====
-let countersDone = new Set();
-function animateCounter(el) {
-  if (countersDone.has(el)) return;
-  countersDone.add(el);
+function formatNum(n) {
+  if (n >= 1000) return (n / 1000).toFixed(n % 1000 === 0 ? 0 : 1) + 'K';
+  return n.toLocaleString();
+}
+
+document.querySelectorAll('.counter-stat').forEach(el => {
   const target = parseInt(el.dataset.target, 10);
-  const suffix = el.dataset.suffix || '';
-  const duration = 1800;
+  const duration = 1600;
   const start = performance.now();
   function step(now) {
-    const elapsed = now - start;
-    const progress = Math.min(elapsed / duration, 1);
-    const eased = 1 - Math.pow(1 - progress, 3);
-    const val = Math.round(eased * target);
-    el.textContent = val + suffix;
-    if (progress < 1) requestAnimationFrame(step);
+    const t = Math.min((now - start) / duration, 1);
+    const eased = 1 - Math.pow(1 - t, 3);
+    el.textContent = formatNum(Math.round(eased * target));
+    if (t < 1) requestAnimationFrame(step);
   }
   requestAnimationFrame(step);
-}
-const counterObserver = new IntersectionObserver((entries) => {
-  entries.forEach(e => {
-    if (e.isIntersecting) countersDone.has(e.target) || animateCounter(e.target);
-  });
-}, { threshold: 0.5 });
-document.querySelectorAll('.counter-value').forEach(el => counterObserver.observe(el));
-
-// ===== TEAM AUTO SLIDER =====
-const track = document.getElementById('teamTrack');
-const dots = document.querySelectorAll('#teamDots .slider-dot');
-let currentSlide = 0;
-const totalSlides = 4;
-let autoSlide;
-
-function getSlidesPerView() {
-  if (window.innerWidth < 576) return 1;
-  if (window.innerWidth < 992) return 2;
-  return 4;
-}
-
-function updateSlideWidths() {
-  const spv = getSlidesPerView();
-  track.querySelectorAll('.team-slide').forEach(s => {
-    s.style.width = (100 / spv) + '%';
-  });
-}
-
-function goToSlide(idx) {
-  currentSlide = ((idx % totalSlides) + totalSlides) % totalSlides;
-  const spv = getSlidesPerView();
-  const offset = (100 / spv) * currentSlide;
-  track.style.transform = `translateX(-${offset}%)`;
-  dots.forEach((d, i) => d.classList.toggle('active', i === currentSlide));
-}
-
-function startAutoSlide() {
-  autoSlide = setInterval(() => goToSlide(currentSlide + 1), 3500);
-}
-function stopAutoSlide() { clearInterval(autoSlide); }
-
-document.getElementById('teamNext').addEventListener('click', () => { stopAutoSlide(); goToSlide(currentSlide + 1); startAutoSlide(); });
-document.getElementById('teamPrev').addEventListener('click', () => { stopAutoSlide(); goToSlide(currentSlide - 1); startAutoSlide(); });
-dots.forEach((d, i) => d.addEventListener('click', () => { stopAutoSlide(); goToSlide(i); startAutoSlide(); }));
-
-updateSlideWidths();
-startAutoSlide();
-window.addEventListener('resize', () => { updateSlideWidths(); goToSlide(currentSlide); });
-
-// ===== BACK TO TOP with rolling progress ring =====
-const backBtn = document.getElementById('backToTop');
-const progressCircle = document.getElementById('progressCircle');
-const circumference = 2 * Math.PI * 22;
-progressCircle.style.strokeDasharray = circumference;
-progressCircle.style.strokeDashoffset = circumference;
-
-window.addEventListener('scroll', () => {
-  const scrollTop = window.scrollY;
-  const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-  const progress = scrollTop / docHeight;
-  const offset = circumference - progress * circumference;
-  progressCircle.style.strokeDashoffset = offset;
-
-  if (scrollTop > 400) backBtn.classList.add('show');
-  else backBtn.classList.remove('show');
 });
 
-backBtn.addEventListener('click', () => {
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+// ===== CHART =====
+const chartData = {
+  week: {
+    labels: ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'],
+    data: [42, 68, 95, 53, 87, 110, 76]
+  },
+  month: {
+    labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
+    data: [52, 75, 98, 64, 110, 88, 120, 105, 130, 95, 115, 140]
+  },
+  year: {
+    labels: ['2020','2021','2022','2023','2024','2025','2026'],
+    data: [320, 480, 560, 720, 890, 1050, 1240]
+  }
+};
+
+const ctx = document.getElementById('visitChart').getContext('2d');
+
+const gradient = ctx.createLinearGradient(0, 0, 0, 280);
+gradient.addColorStop(0, 'rgba(3,139,140,0.18)');
+gradient.addColorStop(1, 'rgba(3,139,140,0.00)');
+
+let visitChart = new Chart(ctx, {
+  type: 'bar',
+  data: {
+    labels: chartData.month.labels,
+    datasets: [{
+      label: "Client Visits",
+      data: chartData.month.data,
+      backgroundColor: 'rgba(3,139,140,0.85)',
+      borderRadius: 8,
+      borderRadiusTopLeft: 8,
+      borderRadiusTopRight: 8,
+      hoverBackgroundColor: '#014d4e',
+      borderSkipped: false,
+      barPercentage: 0.55,
+      categoryPercentage: 0.75,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: {
+      duration: 600,
+      easing: 'easeOutCubic'
+    },
+    plugins: {
+      legend: { display: false },
+      tooltip: {
+        backgroundColor: '#014d4e',
+        titleColor: '#34d399',
+        bodyColor: '#fff',
+        padding: 12,
+        cornerRadius: 10,
+        displayColors: false,
+        callbacks: {
+          title: ctx => ctx[0].label,
+          label: ctx => `Visits: ${ctx.raw.toLocaleString()}`
+        }
+      }
+    },
+    scales: {
+      x: {
+        grid: { display: false },
+        ticks: {
+          font: { family: "'DM Sans', sans-serif", size: 12 },
+          color: '#9ca3af'
+        },
+        border: { display: false }
+      },
+      y: {
+        grid: {
+          color: 'rgba(0,0,0,0.04)',
+          drawBorder: false
+        },
+        ticks: {
+          font: { family: "'DM Sans', sans-serif", size: 11 },
+          color: '#9ca3af',
+          maxTicksLimit: 5
+        },
+        border: { display: false }
+      }
+    }
+  }
 });
+
+function updateChart(period, btn) {
+  document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  visitChart.data.labels = chartData[period].labels;
+  visitChart.data.datasets[0].data = chartData[period].data;
+  visitChart.update();
+}
 </script>
 </body>
 </html>
