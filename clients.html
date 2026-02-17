@@ -1,0 +1,1171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Clients — Consulting Admin</title>
+
+<!-- Bootstrap 5 -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"/>
+<!-- Bootstrap Icons -->
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css" rel="stylesheet"/>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&display=swap" rel="stylesheet"/>
+
+<style>
+/* ===== ROOT VARIABLES (identical to dashboard) ===== */
+:root {
+  --brand-dark:    #014d4e;
+  --brand-primary: #038b8c;
+  --brand-mid:     #059b9c;
+  --brand-light:   #e8f8f7;
+  --brand-xlight:  #f0fdfb;
+  --brand-accent:  #34d399;
+  --sidebar-w:     280px;
+  --topbar-h:      72px;
+  --white:         #ffffff;
+  --gray-50:       #f9fafb;
+  --gray-100:      #f3f4f6;
+  --gray-200:      #e5e7eb;
+  --gray-300:      #d1d5db;
+  --gray-400:      #9ca3af;
+  --gray-500:      #6b7280;
+  --gray-700:      #374151;
+  --gray-800:      #1f2937;
+  --shadow-sm:     0 2px 8px rgba(1,77,78,0.07);
+  --shadow-md:     0 6px 24px rgba(1,77,78,0.10);
+  --shadow-lg:     0 12px 40px rgba(1,77,78,0.14);
+  --radius:        14px;
+  --radius-sm:     10px;
+}
+
+html, body { height: 100%; color-scheme: light !important; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--brand-xlight);
+  color: var(--gray-800);
+  overflow-x: hidden;
+}
+h1,h2,h3,h4,h5,h6 { font-family: 'Syne', sans-serif; }
+
+/* ===== LAYOUT ===== */
+.dashboard-shell { display: flex; min-height: 100vh; }
+
+/* ===== SIDEBAR ===== */
+.sidebar {
+  width: var(--sidebar-w);
+  min-height: 100vh;
+  background: var(--brand-dark);
+  display: flex;
+  flex-direction: column;
+  position: fixed;
+  top: 0; left: 0;
+  z-index: 1050;
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  overflow: hidden;
+}
+.sidebar-brand {
+  padding: 1.5rem 1.75rem 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  min-height: var(--topbar-h);
+}
+.brand-logo {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.4rem; font-weight: 800;
+  color: white; text-decoration: none;
+  letter-spacing: -0.5px; white-space: nowrap;
+}
+.brand-logo span { color: var(--brand-accent); }
+.sidebar-toggle {
+  background: none; border: none;
+  color: rgba(255,255,255,0.6);
+  font-size: 1.25rem; cursor: pointer;
+  padding: 4px; border-radius: 6px;
+  transition: color 0.2s, background 0.2s; flex-shrink: 0;
+}
+.sidebar-toggle:hover { color: white; background: rgba(255,255,255,0.08); }
+.sidebar-scroll {
+  flex: 1; overflow-y: auto; overflow-x: hidden;
+  padding: 1.25rem 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,0.1) transparent;
+}
+.sidebar-scroll::-webkit-scrollbar { width: 4px; }
+.sidebar-scroll::-webkit-scrollbar-track { background: transparent; }
+.sidebar-scroll::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 4px; }
+.nav-section-label {
+  font-size: 0.65rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.12em;
+  color: rgba(255,255,255,0.35);
+  padding: 0 1.75rem; margin-bottom: 0.5rem; white-space: nowrap;
+}
+.nav-item-link {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.75rem 1.75rem;
+  color: rgba(255,255,255,0.65);
+  text-decoration: none;
+  font-size: 0.9rem; font-weight: 500;
+  transition: color 0.2s, background 0.2s;
+  white-space: nowrap; position: relative;
+}
+.nav-item-link i { font-size: 1.1rem; flex-shrink: 0; width: 20px; text-align: center; }
+.nav-item-link:hover { color: white; background: rgba(255,255,255,0.06); }
+.nav-item-link.active {
+  color: white; background: var(--brand-primary); font-weight: 600;
+}
+.nav-item-link.active::before {
+  content: ''; position: absolute;
+  left: 0; top: 0; bottom: 0; width: 3px;
+  background: var(--brand-accent); border-radius: 0 2px 2px 0;
+}
+.nav-item-link .badge-count {
+  margin-left: auto;
+  background: var(--brand-accent); color: var(--brand-dark);
+  font-size: 0.65rem; font-weight: 700;
+  padding: 2px 7px; border-radius: 20px;
+}
+.sidebar-footer { padding: 1rem 0.75rem; border-top: 1px solid rgba(255,255,255,0.07); }
+.logout-btn {
+  display: flex; align-items: center; gap: 0.9rem;
+  padding: 0.8rem 1rem;
+  background: var(--brand-primary); color: white;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 0.9rem; font-weight: 600; width: 100%;
+  cursor: pointer; transition: background 0.2s, transform 0.2s;
+  font-family: 'DM Sans', sans-serif; white-space: nowrap;
+}
+.logout-btn:hover { background: #025e60; transform: translateY(-1px); }
+.logout-btn i { font-size: 1rem; flex-shrink: 0; }
+
+/* Mobile overlay */
+.sidebar-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45); z-index: 1049;
+  backdrop-filter: blur(2px);
+}
+.sidebar-overlay.show { display: block; }
+
+/* ===== MAIN ===== */
+.main-content {
+  margin-left: var(--sidebar-w);
+  flex: 1; display: flex; flex-direction: column; min-height: 100vh;
+  transition: margin-left 0.35s;
+}
+
+/* ===== TOPBAR ===== */
+.topbar {
+  height: var(--topbar-h);
+  background: white;
+  border-bottom: 1px solid var(--gray-200);
+  display: flex; align-items: center;
+  padding: 0 2rem; gap: 1rem;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: var(--shadow-sm);
+}
+.topbar-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.5rem; font-weight: 800;
+  color: var(--gray-800); white-space: nowrap; flex-shrink: 0;
+}
+.topbar-title span { color: var(--brand-primary); }
+.topbar-search { flex: 1; max-width: 300px; margin-left: 1rem; }
+.search-wrap { position: relative; }
+.search-wrap i {
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%); color: var(--gray-400); font-size: 0.9rem;
+}
+.search-input {
+  width: 100%; padding: 0.5rem 1rem 0.5rem 2.25rem;
+  border: 1.5px solid var(--gray-200); border-radius: 30px;
+  font-size: 0.8rem; font-family: 'DM Sans', sans-serif;
+  background: var(--brand-xlight); color: var(--gray-700);
+  transition: border-color 0.2s, box-shadow 0.2s; outline: none;
+}
+.search-input:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(3,139,140,0.12); }
+.topbar-spacer { flex: 1; }
+.topbar-actions { display: flex; align-items: center; gap: 0.5rem; }
+.action-btn {
+  width: 40px; height: 40px; border-radius: 50%;
+  border: 1.5px solid var(--gray-200); background: white;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-500); font-size: 1.1rem;
+  cursor: pointer; transition: all 0.2s; position: relative; text-decoration: none;
+}
+.action-btn:hover { background: var(--brand-light); color: var(--brand-primary); border-color: var(--brand-primary); }
+.action-btn .notif-badge {
+  position: absolute; top: -3px; right: -3px;
+  width: 16px; height: 16px; background: #ef4444; color: white;
+  font-size: 0.55rem; font-weight: 700; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; border: 2px solid white;
+}
+.mobile-sidebar-toggle {
+  display: none; background: none; border: none;
+  color: var(--gray-700); font-size: 1.4rem; cursor: pointer; padding: 4px;
+}
+
+/* ===== PAGE CONTENT ===== */
+.page-content { flex: 1; padding: 1.75rem 2rem; }
+
+/* ===== PAGE HEADER ===== */
+.page-header {
+  display: flex; align-items: flex-start;
+  justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  margin-bottom: 1.75rem;
+}
+.page-header-left h2 {
+  font-size: 1.5rem; font-weight: 800; color: var(--gray-800); margin: 0 0 4px;
+}
+.breadcrumb-trail { font-size: 0.78rem; color: var(--gray-400); margin: 0; }
+.breadcrumb-trail span { color: var(--brand-primary); font-weight: 600; }
+
+.btn-add-client {
+  display: flex; align-items: center; gap: 0.5rem;
+  padding: 0.65rem 1.4rem;
+  background: var(--brand-primary); color: white;
+  border: none; border-radius: var(--radius-sm);
+  font-size: 0.875rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif; white-space: nowrap;
+}
+.btn-add-client:hover { background: var(--brand-dark); transform: translateY(-1px); box-shadow: var(--shadow-md); }
+.btn-add-client i { font-size: 1rem; }
+
+/* ===== STATS ROW ===== */
+.clients-stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.mini-stat {
+  background: white;
+  border-radius: var(--radius);
+  padding: 1.25rem 1.4rem;
+  display: flex; align-items: center; gap: 1rem;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s, transform 0.25s;
+  animation: fadeSlideUp 0.4s ease both;
+}
+.mini-stat:hover { box-shadow: var(--shadow-md); transform: translateY(-3px); }
+.mini-stat:nth-child(1) { animation-delay: 0.05s; }
+.mini-stat:nth-child(2) { animation-delay: 0.10s; }
+.mini-stat:nth-child(3) { animation-delay: 0.15s; }
+.mini-stat:nth-child(4) { animation-delay: 0.20s; }
+.mini-stat-icon {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.2rem; flex-shrink: 0;
+}
+.icon-teal   { background: #ccfbf1; color: #0d9488; }
+.icon-purple { background: #ede9fe; color: #7c3aed; }
+.icon-amber  { background: #fef3c7; color: #d97706; }
+.icon-blue   { background: #dbeafe; color: #2563eb; }
+.icon-coral  { background: #fee2e2; color: #dc2626; }
+.icon-green  { background: #dcfce7; color: #16a34a; }
+.mini-stat-body {}
+.mini-stat-label { font-size: 0.75rem; color: var(--gray-500); margin: 0 0 2px; }
+.mini-stat-value {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.35rem; font-weight: 800; color: var(--gray-800); margin: 0;
+}
+
+/* ===== TOOLBAR ===== */
+.clients-toolbar {
+  display: flex; align-items: center; flex-wrap: wrap; gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+.toolbar-search-wrap { position: relative; flex: 1; min-width: 200px; max-width: 320px; }
+.toolbar-search-wrap i {
+  position: absolute; left: 12px; top: 50%;
+  transform: translateY(-50%); color: var(--gray-400); font-size: 0.9rem;
+  pointer-events: none;
+}
+.toolbar-search {
+  width: 100%; padding: 0.6rem 1rem 0.6rem 2.3rem;
+  border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  font-size: 0.85rem; font-family: 'DM Sans', sans-serif;
+  background: white; color: var(--gray-700);
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.toolbar-search:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(3,139,140,0.1); }
+
+.toolbar-filter {
+  display: flex; align-items: center; gap: 0.5rem;
+}
+.filter-select {
+  padding: 0.55rem 2rem 0.55rem 0.9rem;
+  border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  font-size: 0.82rem; font-family: 'DM Sans', sans-serif;
+  color: var(--gray-700); background: white;
+  appearance: none; outline: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%239ca3af' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 8px center;
+  cursor: pointer; transition: border-color 0.2s;
+}
+.filter-select:focus { border-color: var(--brand-primary); }
+
+.view-toggle { display: flex; gap: 4px; }
+.view-btn {
+  width: 36px; height: 36px; border-radius: 8px;
+  border: 1.5px solid var(--gray-200); background: white;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-400); font-size: 0.95rem;
+  cursor: pointer; transition: all 0.2s;
+}
+.view-btn.active, .view-btn:hover { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+
+.toolbar-spacer { flex: 1; }
+.export-btn {
+  display: flex; align-items: center; gap: 0.4rem;
+  padding: 0.55rem 1.1rem;
+  border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  background: white; color: var(--gray-600);
+  font-size: 0.82rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s;
+  font-family: 'DM Sans', sans-serif;
+}
+.export-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+
+/* ===== CLIENTS TABLE ===== */
+.table-card {
+  background: white;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+  animation: fadeSlideUp 0.5s ease 0.25s both;
+}
+.table-responsive { overflow-x: auto; }
+
+.clients-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.clients-table thead {
+  background: var(--brand-xlight);
+  border-bottom: 1.5px solid var(--gray-200);
+}
+.clients-table thead th {
+  padding: 0.9rem 1.25rem;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.72rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.07em;
+  color: var(--gray-500); white-space: nowrap;
+  cursor: pointer; user-select: none;
+  transition: color 0.2s;
+}
+.clients-table thead th:hover { color: var(--brand-primary); }
+.clients-table thead th i { margin-left: 4px; font-size: 0.7rem; }
+.clients-table thead th:first-child { padding-left: 1.5rem; }
+.clients-table thead th:last-child { padding-right: 1.5rem; }
+
+.clients-table tbody tr {
+  border-bottom: 1px solid var(--gray-100);
+  transition: background 0.18s;
+}
+.clients-table tbody tr:last-child { border-bottom: none; }
+.clients-table tbody tr:hover { background: var(--brand-xlight); }
+
+.clients-table td {
+  padding: 1rem 1.25rem;
+  vertical-align: middle; white-space: nowrap;
+}
+.clients-table td:first-child { padding-left: 1.5rem; }
+.clients-table td:last-child { padding-right: 1.5rem; }
+
+/* Checkbox */
+.custom-check {
+  width: 16px; height: 16px;
+  accent-color: var(--brand-primary);
+  cursor: pointer;
+}
+
+/* Client name cell */
+.client-cell { display: flex; align-items: center; gap: 0.9rem; }
+.client-avatar-sm {
+  width: 38px; height: 38px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif;
+  font-size: 0.8rem; font-weight: 700; color: white;
+  flex-shrink: 0;
+}
+.client-name-main {
+  font-weight: 600; color: var(--gray-800);
+  font-family: 'Syne', sans-serif; font-size: 0.88rem;
+}
+.client-email { font-size: 0.75rem; color: var(--gray-400); margin-top: 1px; }
+
+/* Status badge */
+.status-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 20px;
+  font-size: 0.72rem; font-weight: 600;
+}
+.status-badge::before {
+  content: ''; width: 6px; height: 6px;
+  border-radius: 50%; flex-shrink: 0;
+}
+.badge-active   { background: #d1fae5; color: #065f46; }
+.badge-active::before   { background: #10b981; }
+.badge-pending  { background: #fef3c7; color: #92400e; }
+.badge-pending::before  { background: #f59e0b; }
+.badge-inactive { background: var(--gray-100); color: var(--gray-500); }
+.badge-inactive::before { background: var(--gray-400); }
+.badge-vip      { background: #ede9fe; color: #5b21b6; }
+.badge-vip::before      { background: #7c3aed; }
+
+/* Industry tag */
+.industry-tag {
+  display: inline-block;
+  padding: 3px 10px; border-radius: 6px;
+  font-size: 0.72rem; font-weight: 500;
+  background: var(--brand-light); color: var(--brand-dark);
+}
+
+/* Revenue */
+.revenue-val { font-family: 'Syne', sans-serif; font-weight: 700; color: var(--gray-800); }
+
+/* Action buttons */
+.row-actions { display: flex; align-items: center; gap: 4px; }
+.row-action-btn {
+  width: 30px; height: 30px; border-radius: 7px;
+  border: 1px solid var(--gray-200); background: white;
+  display: flex; align-items: center; justify-content: center;
+  color: var(--gray-400); font-size: 0.8rem;
+  cursor: pointer; transition: all 0.18s;
+}
+.row-action-btn:hover { background: var(--brand-light); color: var(--brand-primary); border-color: var(--brand-primary); }
+.row-action-btn.danger:hover { background: #fee2e2; color: #dc2626; border-color: #dc2626; }
+
+/* ===== PAGINATION ===== */
+.table-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1rem 1.5rem;
+  border-top: 1px solid var(--gray-100);
+  flex-wrap: wrap; gap: 0.75rem;
+}
+.table-info-text { font-size: 0.8rem; color: var(--gray-400); }
+.pagination-wrap { display: flex; gap: 4px; }
+.page-btn {
+  width: 34px; height: 34px; border-radius: 8px;
+  border: 1.5px solid var(--gray-200); background: white;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 0.8rem; font-weight: 600; color: var(--gray-500);
+  cursor: pointer; transition: all 0.18s;
+  font-family: 'DM Sans', sans-serif;
+}
+.page-btn:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+.page-btn.active { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+.page-btn:disabled { opacity: 0.4; cursor: not-allowed; }
+
+/* ===== GRID VIEW ===== */
+.clients-grid {
+  display: none;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+.clients-grid.show { display: grid; }
+.client-grid-card {
+  background: white; border-radius: var(--radius);
+  padding: 1.5rem; text-align: center;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow 0.25s, transform 0.25s;
+  animation: fadeSlideUp 0.45s ease both;
+  cursor: pointer;
+}
+.client-grid-card:hover { box-shadow: var(--shadow-md); transform: translateY(-4px); }
+.grid-avatar {
+  width: 62px; height: 62px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 1.1rem; font-weight: 700;
+  color: white; margin: 0 auto 1rem;
+  border: 3px solid var(--brand-light);
+}
+.grid-client-name {
+  font-family: 'Syne', sans-serif;
+  font-size: 0.95rem; font-weight: 700; color: var(--gray-800); margin: 0 0 2px;
+}
+.grid-client-role { font-size: 0.75rem; color: var(--gray-400); margin: 0 0 0.75rem; }
+.grid-divider { border: none; border-top: 1px solid var(--gray-100); margin: 0.9rem 0; }
+.grid-stats { display: flex; justify-content: space-around; }
+.grid-stat-item {}
+.grid-stat-val {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem; font-weight: 700; color: var(--brand-primary);
+}
+.grid-stat-lbl { font-size: 0.68rem; color: var(--gray-400); }
+.grid-card-actions { display: flex; gap: 0.5rem; margin-top: 1rem; }
+.grid-btn {
+  flex: 1; padding: 0.5rem;
+  border-radius: 8px; font-size: 0.78rem; font-weight: 600;
+  cursor: pointer; transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+  border: 1.5px solid transparent;
+}
+.grid-btn-primary { background: var(--brand-primary); color: white; border-color: var(--brand-primary); }
+.grid-btn-primary:hover { background: var(--brand-dark); }
+.grid-btn-outline { background: white; color: var(--brand-primary); border-color: var(--brand-primary); }
+.grid-btn-outline:hover { background: var(--brand-light); }
+
+/* ===== DRAWER (Client Detail) ===== */
+.detail-drawer {
+  position: fixed; top: 0; right: 0; bottom: 0;
+  width: 380px; background: white;
+  box-shadow: -8px 0 40px rgba(0,0,0,0.12);
+  z-index: 2000;
+  transform: translateX(100%);
+  transition: transform 0.35s cubic-bezier(0.4,0,0.2,1);
+  display: flex; flex-direction: column;
+  overflow-y: auto;
+}
+.detail-drawer.open { transform: translateX(0); }
+.drawer-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.3); z-index: 1999;
+  display: none; backdrop-filter: blur(2px);
+}
+.drawer-overlay.show { display: block; }
+.drawer-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--gray-100);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--brand-xlight);
+}
+.drawer-title {
+  font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 700; color: var(--gray-800); margin: 0;
+}
+.drawer-close {
+  width: 32px; height: 32px; border-radius: 8px;
+  border: none; background: white; color: var(--gray-400);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1rem; cursor: pointer; transition: all 0.2s;
+}
+.drawer-close:hover { background: #fee2e2; color: #dc2626; }
+.drawer-body { padding: 1.5rem; flex: 1; }
+.drawer-profile { text-align: center; margin-bottom: 1.5rem; }
+.drawer-avatar {
+  width: 76px; height: 76px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Syne', sans-serif; font-size: 1.5rem; font-weight: 800;
+  color: white; margin: 0 auto 1rem;
+  border: 4px solid var(--brand-light);
+}
+.drawer-name {
+  font-family: 'Syne', sans-serif; font-size: 1.15rem; font-weight: 800; color: var(--gray-800); margin: 0 0 4px;
+}
+.drawer-role { font-size: 0.8rem; color: var(--gray-400); margin: 0; }
+.drawer-section-title {
+  font-family: 'Syne', sans-serif; font-size: 0.78rem; font-weight: 700;
+  text-transform: uppercase; letter-spacing: 0.08em;
+  color: var(--gray-400); margin: 1.25rem 0 0.75rem;
+}
+.drawer-info-row {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 0.6rem 0; border-bottom: 1px solid var(--gray-100);
+  font-size: 0.82rem;
+}
+.drawer-info-row:last-child { border-bottom: none; }
+.drawer-info-label { color: var(--gray-400); font-weight: 500; }
+.drawer-info-value { color: var(--gray-800); font-weight: 600; text-align: right; max-width: 60%; }
+.drawer-stat-grid {
+  display: grid; grid-template-columns: 1fr 1fr 1fr;
+  gap: 0.75rem; margin: 1rem 0;
+}
+.drawer-stat {
+  background: var(--brand-xlight); border-radius: 10px;
+  padding: 0.75rem; text-align: center;
+}
+.drawer-stat-val {
+  font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: var(--brand-primary);
+}
+.drawer-stat-lbl { font-size: 0.65rem; color: var(--gray-400); margin-top: 2px; }
+.drawer-footer { padding: 1.25rem 1.5rem; border-top: 1px solid var(--gray-100); display: flex; gap: 0.75rem; }
+.drawer-btn { flex: 1; padding: 0.7rem; border-radius: var(--radius-sm); font-size: 0.85rem; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; transition: all 0.2s; border: none; }
+.drawer-btn-primary { background: var(--brand-primary); color: white; }
+.drawer-btn-primary:hover { background: var(--brand-dark); }
+.drawer-btn-outline { background: white; color: var(--gray-600); border: 1.5px solid var(--gray-200); }
+.drawer-btn-outline:hover { border-color: var(--brand-primary); color: var(--brand-primary); }
+
+/* ===== ADD CLIENT MODAL ===== */
+.modal-content { border: none; border-radius: var(--radius); box-shadow: var(--shadow-lg); }
+.modal-header { background: var(--brand-xlight); border-bottom: 1px solid var(--gray-200); border-radius: var(--radius) var(--radius) 0 0; padding: 1.25rem 1.5rem; }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 1rem; font-weight: 800; color: var(--gray-800); }
+.modal-body { padding: 1.5rem; }
+.modal-footer { padding: 1rem 1.5rem; border-top: 1px solid var(--gray-100); }
+.form-label-sm { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray-600); margin-bottom: 0.4rem; display: block; }
+.form-control-brand {
+  width: 100%; padding: 0.6rem 0.9rem;
+  border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  font-size: 0.875rem; font-family: 'DM Sans', sans-serif;
+  color: var(--gray-800); background: var(--brand-xlight);
+  outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-control-brand:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(3,139,140,0.1); background: white; }
+.form-select-brand {
+  width: 100%; padding: 0.6rem 2rem 0.6rem 0.9rem;
+  border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+  font-size: 0.875rem; font-family: 'DM Sans', sans-serif;
+  color: var(--gray-800); background: var(--brand-xlight);
+  outline: none; appearance: none; cursor: pointer;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.form-select-brand:focus { border-color: var(--brand-primary); box-shadow: 0 0 0 3px rgba(3,139,140,0.1); }
+
+/* ===== FOOTER ===== */
+.dashboard-footer {
+  background: var(--brand-light); border-top: 1px solid var(--gray-200);
+  text-align: center; padding: 1rem 2rem;
+  font-size: 0.8rem; color: var(--gray-500);
+}
+
+/* ===== ANIMATIONS ===== */
+@keyframes fadeSlideUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1200px) {
+  .clients-stats-row { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 991px) {
+  .sidebar { transform: translateX(calc(-1 * var(--sidebar-w))); }
+  .sidebar.open { transform: translateX(0); }
+  .main-content { margin-left: 0; }
+  .mobile-sidebar-toggle { display: flex; }
+  .topbar-search { max-width: 200px; }
+  .clients-stats-row { grid-template-columns: repeat(2, 1fr); }
+  .detail-drawer { width: 100%; max-width: 380px; }
+}
+@media (max-width: 640px) {
+  .page-content { padding: 1.25rem 1rem; }
+  .topbar { padding: 0 1rem; }
+  .topbar-title { font-size: 1.2rem; }
+  .topbar-search { display: none; }
+  .clients-stats-row { grid-template-columns: repeat(2, 1fr); gap: 0.75rem; }
+  .toolbar-spacer { display: none; }
+  .export-btn { display: none; }
+  .page-header { flex-direction: column; gap: 0.75rem; }
+  .page-header .btn-add-client { width: 100%; justify-content: center; }
+}
+
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--gray-200); border-radius: 4px; }
+</style>
+</head>
+<body>
+
+<!-- Sidebar overlay -->
+<div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<!-- Drawer overlay -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+
+<!-- Detail Drawer -->
+<div class="detail-drawer" id="detailDrawer">
+  <div class="drawer-header">
+    <h5 class="drawer-title">Client Profile</h5>
+    <button class="drawer-close" onclick="closeDrawer()"><i class="bi bi-x-lg"></i></button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-profile">
+      <div class="drawer-avatar" id="drawerAvatar">OD</div>
+      <p class="drawer-name" id="drawerName">Olaoye Damilola</p>
+      <p class="drawer-role" id="drawerRole">Product Manager · Fintech</p>
+      <div style="margin-top:0.75rem;" id="drawerStatus"></div>
+    </div>
+    <div class="drawer-stat-grid">
+      <div class="drawer-stat"><div class="drawer-stat-val" id="ds1">$48K</div><div class="drawer-stat-lbl">Revenue</div></div>
+      <div class="drawer-stat"><div class="drawer-stat-val" id="ds2">24</div><div class="drawer-stat-lbl">Projects</div></div>
+      <div class="drawer-stat"><div class="drawer-stat-val" id="ds3">3y</div><div class="drawer-stat-lbl">With Us</div></div>
+    </div>
+    <div class="drawer-section-title">Contact Details</div>
+    <div class="drawer-info-row"><span class="drawer-info-label">Email</span><span class="drawer-info-value" id="drawerEmail">olaoye@example.com</span></div>
+    <div class="drawer-info-row"><span class="drawer-info-label">Phone</span><span class="drawer-info-value" id="drawerPhone">+234 800 000 0001</span></div>
+    <div class="drawer-info-row"><span class="drawer-info-label">Location</span><span class="drawer-info-value" id="drawerLocation">Lagos, Nigeria</span></div>
+    <div class="drawer-section-title">Account Details</div>
+    <div class="drawer-info-row"><span class="drawer-info-label">Client ID</span><span class="drawer-info-value" id="drawerID">#CLT-001</span></div>
+    <div class="drawer-info-row"><span class="drawer-info-label">Joined</span><span class="drawer-info-value" id="drawerJoined">Jan 12, 2022</span></div>
+    <div class="drawer-info-row"><span class="drawer-info-label">Last Active</span><span class="drawer-info-value" id="drawerActive">Today</span></div>
+    <div class="drawer-info-row"><span class="drawer-info-label">Account Manager</span><span class="drawer-info-value">Alex Ariyo</span></div>
+  </div>
+  <div class="drawer-footer">
+    <button class="drawer-btn drawer-btn-primary"><i class="bi bi-chat-dots me-1"></i> Message</button>
+    <button class="drawer-btn drawer-btn-outline"><i class="bi bi-pencil me-1"></i> Edit</button>
+  </div>
+</div>
+
+<!-- Add Client Modal -->
+<div class="modal fade" id="addClientModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add New Client</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-3">
+          <div class="col-6">
+            <label class="form-label-sm">First Name</label>
+            <input type="text" class="form-control-brand" placeholder="First name"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label-sm">Last Name</label>
+            <input type="text" class="form-control-brand" placeholder="Last name"/>
+          </div>
+          <div class="col-12">
+            <label class="form-label-sm">Email Address</label>
+            <input type="email" class="form-control-brand" placeholder="email@example.com"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label-sm">Phone</label>
+            <input type="tel" class="form-control-brand" placeholder="+1 234 567 890"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label-sm">Location</label>
+            <input type="text" class="form-control-brand" placeholder="City, Country"/>
+          </div>
+          <div class="col-6">
+            <label class="form-label-sm">Industry</label>
+            <select class="form-select-brand">
+              <option>Fintech</option>
+              <option>Healthcare</option>
+              <option>E-commerce</option>
+              <option>Real Estate</option>
+              <option>Logistics</option>
+              <option>Education</option>
+            </select>
+          </div>
+          <div class="col-6">
+            <label class="form-label-sm">Status</label>
+            <select class="form-select-brand">
+              <option>Active</option>
+              <option>Pending</option>
+              <option>Inactive</option>
+              <option>VIP</option>
+            </select>
+          </div>
+          <div class="col-12">
+            <label class="form-label-sm">Notes</label>
+            <textarea class="form-control-brand" rows="3" placeholder="Optional notes..." style="resize:vertical;"></textarea>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="drawer-btn drawer-btn-outline" data-bs-dismiss="modal" style="flex:0;padding:0.6rem 1.25rem;">Cancel</button>
+        <button class="drawer-btn drawer-btn-primary" data-bs-dismiss="modal" style="flex:0;padding:0.6rem 1.5rem;">Add Client</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== DASHBOARD SHELL ===== -->
+<div class="dashboard-shell">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <a href="dashboard.html" class="brand-logo">Consult<span>.</span></a>
+      <button class="sidebar-toggle" title="Toggle sidebar">
+        <i class="bi bi-layout-sidebar-reverse"></i>
+      </button>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="nav-section-label mb-3">Menu</div>
+      <a href="dashboard.html" class="nav-item-link">
+        <i class="bi bi-grid-1x2-fill"></i><span>Dashboard</span>
+      </a>
+      <a href="#" class="nav-item-link active">
+        <i class="bi bi-people-fill"></i><span>Clients</span>
+        <span class="badge-count">24</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-wallet2"></i><span>Wallet</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-arrow-left-right"></i><span>Transactions</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-chat-dots-fill"></i><span>Messages</span>
+        <span class="badge-count">7</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-file-earmark-text"></i><span>Submitted Quotes</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-activity"></i><span>Activities</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-person-circle"></i><span>Profile</span>
+      </a>
+      <a href="#" class="nav-item-link">
+        <i class="bi bi-gear-fill"></i><span>Settings</span>
+      </a>
+    </div>
+    <div class="sidebar-footer">
+      <button class="logout-btn">
+        <i class="bi bi-power"></i><span>Logout</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <div class="main-content">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <button class="mobile-sidebar-toggle" id="mobileToggle">
+        <i class="bi bi-list"></i>
+      </button>
+      <div class="topbar-title">Clients<span>.</span></div>
+      <div class="topbar-search">
+        <div class="search-wrap">
+          <i class="bi bi-search"></i>
+          <input class="search-input" type="text" placeholder="Search clients…" id="topbarSearch"/>
+        </div>
+      </div>
+      <div class="topbar-spacer"></div>
+      <div class="topbar-actions">
+        <button class="action-btn" title="Theme"><i class="bi bi-brightness-high-fill"></i></button>
+        <button class="action-btn" title="Messages"><i class="bi bi-chat-square-dots-fill"></i></button>
+        <button class="action-btn" title="Notifications">
+          <i class="bi bi-bell-fill"></i>
+          <span class="notif-badge">3</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- PAGE CONTENT -->
+    <main class="page-content">
+
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-left">
+          <h2>All Clients</h2>
+          <p class="breadcrumb-trail">Dashboard → <span>Clients</span></p>
+        </div>
+        <button class="btn-add-client" data-bs-toggle="modal" data-bs-target="#addClientModal">
+          <i class="bi bi-plus-lg"></i> Add New Client
+        </button>
+      </div>
+
+      <!-- Mini Stats -->
+      <div class="clients-stats-row">
+        <div class="mini-stat">
+          <div class="mini-stat-icon icon-teal"><i class="bi bi-people-fill"></i></div>
+          <div class="mini-stat-body">
+            <p class="mini-stat-label">Total Clients</p>
+            <p class="mini-stat-value counter-stat" data-target="248">0</p>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-icon icon-green"><i class="bi bi-person-check-fill"></i></div>
+          <div class="mini-stat-body">
+            <p class="mini-stat-label">Active Clients</p>
+            <p class="mini-stat-value counter-stat" data-target="183">0</p>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-icon icon-amber"><i class="bi bi-hourglass-split"></i></div>
+          <div class="mini-stat-body">
+            <p class="mini-stat-label">Pending</p>
+            <p class="mini-stat-value counter-stat" data-target="31">0</p>
+          </div>
+        </div>
+        <div class="mini-stat">
+          <div class="mini-stat-icon icon-purple"><i class="bi bi-star-fill"></i></div>
+          <div class="mini-stat-body">
+            <p class="mini-stat-label">VIP Clients</p>
+            <p class="mini-stat-value counter-stat" data-target="34">0</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toolbar -->
+      <div class="clients-toolbar">
+        <div class="toolbar-search-wrap">
+          <i class="bi bi-search"></i>
+          <input class="toolbar-search" type="text" placeholder="Search by name or email…" id="tableSearch"/>
+        </div>
+        <div class="toolbar-filter">
+          <select class="filter-select" id="statusFilter">
+            <option value="">All Status</option>
+            <option value="Active">Active</option>
+            <option value="Pending">Pending</option>
+            <option value="Inactive">Inactive</option>
+            <option value="VIP">VIP</option>
+          </select>
+          <select class="filter-select" id="industryFilter">
+            <option value="">All Industries</option>
+            <option value="Fintech">Fintech</option>
+            <option value="Healthcare">Healthcare</option>
+            <option value="E-commerce">E-commerce</option>
+            <option value="Real Estate">Real Estate</option>
+            <option value="Logistics">Logistics</option>
+            <option value="Education">Education</option>
+          </select>
+        </div>
+        <div class="view-toggle">
+          <button class="view-btn active" id="tableViewBtn" title="Table view" onclick="setView('table')">
+            <i class="bi bi-table"></i>
+          </button>
+          <button class="view-btn" id="gridViewBtn" title="Grid view" onclick="setView('grid')">
+            <i class="bi bi-grid-3x3-gap-fill"></i>
+          </button>
+        </div>
+        <div class="toolbar-spacer"></div>
+        <button class="export-btn"><i class="bi bi-download me-1"></i>Export</button>
+      </div>
+
+      <!-- TABLE VIEW -->
+      <div class="table-card" id="tableView">
+        <div class="table-responsive">
+          <table class="clients-table" id="clientsTable">
+            <thead>
+              <tr>
+                <th><input type="checkbox" class="custom-check" id="selectAll"/></th>
+                <th>Client <i class="bi bi-chevron-expand"></i></th>
+                <th>Industry <i class="bi bi-chevron-expand"></i></th>
+                <th>Status <i class="bi bi-chevron-expand"></i></th>
+                <th>Revenue <i class="bi bi-chevron-expand"></i></th>
+                <th>Projects <i class="bi bi-chevron-expand"></i></th>
+                <th>Joined <i class="bi bi-chevron-expand"></i></th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="clientsTableBody">
+              <!-- Populated by JS -->
+            </tbody>
+          </table>
+        </div>
+        <div class="table-footer">
+          <span class="table-info-text" id="tableInfo">Showing 1–10 of 24 clients</span>
+          <div class="pagination-wrap" id="pagination"></div>
+        </div>
+      </div>
+
+      <!-- GRID VIEW -->
+      <div class="clients-grid" id="gridView"></div>
+
+    </main>
+
+    <footer class="dashboard-footer">
+      © 2026 Consulting Admin. All rights reserved.
+    </footer>
+  </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+// ===== DATA =====
+const clients = [
+  { id:'CLT-001', name:'Olaoye Damilola', email:'olaoye@example.com', phone:'+234 800 000 0001', location:'Lagos, Nigeria',    role:'Product Manager',     industry:'Fintech',     status:'Active',   revenue:'$48,200', projects:24, joined:'Jan 12, 2022', lastActive:'Today',      color:'linear-gradient(135deg,#f97316,#ef4444)' },
+  { id:'CLT-002', name:'John Doe',         email:'john@example.com',   phone:'+1 212 555 0102',  location:'New York, USA',      role:'Lead Developer',      industry:'E-commerce',  status:'VIP',      revenue:'$92,500', projects:41, joined:'Mar 5, 2021',  lastActive:'Yesterday',  color:'linear-gradient(135deg,#038b8c,#014d4e)' },
+  { id:'CLT-003', name:'Olawale Seyi',     email:'seyi@example.com',   phone:'+234 801 000 0003',location:'Abuja, Nigeria',     role:'UI Designer',         industry:'Healthcare',  status:'Pending',  revenue:'$11,800', projects:7,  joined:'Aug 30, 2023', lastActive:'3 days ago', color:'linear-gradient(135deg,#f59e0b,#d97706)' },
+  { id:'CLT-004', name:'Tinubu Yaya',      email:'yaya@example.com',   phone:'+44 20 7946 0004', location:'London, UK',         role:'Business Analyst',    industry:'Real Estate', status:'Active',   revenue:'$67,300', projects:19, joined:'Nov 14, 2022', lastActive:'Today',      color:'linear-gradient(135deg,#8b5cf6,#6d28d9)' },
+  { id:'CLT-005', name:'Amaka Obi',        email:'amaka@example.com',  phone:'+234 803 000 0005',location:'Port Harcourt, NG',  role:'CFO',                 industry:'Logistics',   status:'Active',   revenue:'$34,100', projects:12, joined:'Feb 20, 2023', lastActive:'2 days ago', color:'linear-gradient(135deg,#10b981,#059669)' },
+  { id:'CLT-006', name:'Carlos Rivera',    email:'carlos@example.com', phone:'+52 55 1234 5006', location:'Mexico City, MX',    role:'Marketing Director',  industry:'E-commerce',  status:'Inactive', revenue:'$5,200',  projects:3,  joined:'Sep 7, 2021',  lastActive:'1 month ago',color:'linear-gradient(135deg,#06b6d4,#0891b2)' },
+  { id:'CLT-007', name:'Priya Sharma',     email:'priya@example.com',  phone:'+91 98765 43007',  location:'Mumbai, India',      role:'CTO',                 industry:'Fintech',     status:'VIP',      revenue:'$105,000',projects:58, joined:'Jun 1, 2020',  lastActive:'Today',      color:'linear-gradient(135deg,#ec4899,#be185d)' },
+  { id:'CLT-008', name:'Marcus Lefevre',   email:'marcus@example.com', phone:'+33 1 5555 0008',  location:'Paris, France',      role:'Operations Manager',  industry:'Healthcare',  status:'Active',   revenue:'$29,700', projects:10, joined:'Apr 11, 2023', lastActive:'Today',      color:'linear-gradient(135deg,#14b8a6,#0d9488)' },
+  { id:'CLT-009', name:'Fatima Al-Zahra',  email:'fatima@example.com', phone:'+971 50 000 0009', location:'Dubai, UAE',         role:'CEO',                 industry:'Real Estate', status:'VIP',      revenue:'$210,400',projects:72, joined:'Jan 2, 2020',  lastActive:'Yesterday',  color:'linear-gradient(135deg,#a855f7,#7c3aed)' },
+  { id:'CLT-010', name:'David Mensah',     email:'david@example.com',  phone:'+233 24 000 0010', location:'Accra, Ghana',       role:'Sales Director',      industry:'Education',   status:'Active',   revenue:'$22,600', projects:9,  joined:'Jul 18, 2023', lastActive:'3 days ago', color:'linear-gradient(135deg,#f43f5e,#e11d48)' },
+  { id:'CLT-011', name:'Sofia Andersen',   email:'sofia@example.com',  phone:'+45 31 00 0011',   location:'Copenhagen, DK',     role:'Consultant',          industry:'Logistics',   status:'Pending',  revenue:'$8,400',  projects:4,  joined:'Oct 22, 2023', lastActive:'1 week ago', color:'linear-gradient(135deg,#0ea5e9,#0284c7)' },
+  { id:'CLT-012', name:'James Okafor',     email:'james@example.com',  phone:'+234 805 000 0012',location:'Enugu, Nigeria',     role:'Founder',             industry:'E-commerce',  status:'Active',   revenue:'$38,950', projects:15, joined:'Mar 3, 2022',  lastActive:'Today',      color:'linear-gradient(135deg,#22c55e,#16a34a)' },
+];
+
+// ===== STATE =====
+let currentPage = 1;
+const perPage = 8;
+let currentView = 'table';
+let filtered = [...clients];
+
+// ===== MOBILE SIDEBAR =====
+const sidebar = document.getElementById('sidebar');
+const overlay = document.getElementById('sidebarOverlay');
+document.getElementById('mobileToggle').addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  overlay.classList.toggle('show');
+});
+overlay.addEventListener('click', () => {
+  sidebar.classList.remove('open');
+  overlay.classList.remove('show');
+});
+
+// ===== SELECT ALL =====
+document.getElementById('selectAll').addEventListener('change', function() {
+  document.querySelectorAll('.row-check').forEach(cb => cb.checked = this.checked);
+});
+
+// ===== COUNTER ANIMATION =====
+document.querySelectorAll('.counter-stat').forEach(el => {
+  const target = parseInt(el.dataset.target, 10);
+  const dur = 1200;
+  const start = performance.now();
+  function tick(now) {
+    const t = Math.min((now - start) / dur, 1);
+    const e = 1 - Math.pow(1 - t, 3);
+    el.textContent = Math.round(e * target);
+    if (t < 1) requestAnimationFrame(tick);
+  }
+  requestAnimationFrame(tick);
+});
+
+// ===== RENDER TABLE =====
+function getInitials(name) {
+  return name.split(' ').map(w => w[0]).join('').slice(0,2).toUpperCase();
+}
+
+function statusBadge(s) {
+  const map = { Active:'badge-active', Pending:'badge-pending', Inactive:'badge-inactive', VIP:'badge-vip' };
+  return `<span class="status-badge ${map[s]||'badge-inactive'}">${s}</span>`;
+}
+
+function renderTable() {
+  const tbody = document.getElementById('clientsTableBody');
+  const start = (currentPage - 1) * perPage;
+  const slice = filtered.slice(start, start + perPage);
+
+  tbody.innerHTML = slice.map(c => `
+    <tr>
+      <td><input type="checkbox" class="custom-check row-check"/></td>
+      <td>
+        <div class="client-cell">
+          <div class="client-avatar-sm" style="background:${c.color};">${getInitials(c.name)}</div>
+          <div>
+            <div class="client-name-main">${c.name}</div>
+            <div class="client-email">${c.email}</div>
+          </div>
+        </div>
+      </td>
+      <td><span class="industry-tag">${c.industry}</span></td>
+      <td>${statusBadge(c.status)}</td>
+      <td><span class="revenue-val">${c.revenue}</span></td>
+      <td><span style="font-weight:600;color:var(--gray-700);">${c.projects}</span></td>
+      <td style="color:var(--gray-500);font-size:0.82rem;">${c.joined}</td>
+      <td>
+        <div class="row-actions">
+          <button class="row-action-btn" title="View" onclick='openDrawer(${JSON.stringify(c)})'><i class="bi bi-eye"></i></button>
+          <button class="row-action-btn" title="Message"><i class="bi bi-chat-dots"></i></button>
+          <button class="row-action-btn" title="Edit"><i class="bi bi-pencil"></i></button>
+          <button class="row-action-btn danger" title="Delete"><i class="bi bi-trash"></i></button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+
+  // Info
+  const total = filtered.length;
+  const e = Math.min(start + perPage, total);
+  document.getElementById('tableInfo').textContent = `Showing ${start+1}–${e} of ${total} clients`;
+  renderPagination(total);
+}
+
+function renderPagination(total) {
+  const pages = Math.ceil(total / perPage);
+  const wrap = document.getElementById('pagination');
+  let html = `<button class="page-btn" onclick="goPage(${currentPage-1})" ${currentPage===1?'disabled':''}><i class="bi bi-chevron-left"></i></button>`;
+  for (let i = 1; i <= pages; i++) {
+    if (pages > 7 && i > 2 && i < pages-1 && Math.abs(i-currentPage)>1) {
+      if (i===3||i===pages-2) html += `<button class="page-btn" disabled>…</button>`;
+      continue;
+    }
+    html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="goPage(${i})">${i}</button>`;
+  }
+  html += `<button class="page-btn" onclick="goPage(${currentPage+1})" ${currentPage===pages?'disabled':''}><i class="bi bi-chevron-right"></i></button>`;
+  wrap.innerHTML = html;
+}
+
+function goPage(p) {
+  const pages = Math.ceil(filtered.length / perPage);
+  if (p < 1 || p > pages) return;
+  currentPage = p;
+  renderTable();
+}
+
+// ===== RENDER GRID =====
+function renderGrid() {
+  const grid = document.getElementById('gridView');
+  grid.innerHTML = filtered.map((c, i) => `
+    <div class="client-grid-card" style="animation-delay:${i*0.04}s;" onclick='openDrawer(${JSON.stringify(c)})'>
+      <div class="grid-avatar" style="background:${c.color};">${getInitials(c.name)}</div>
+      <p class="grid-client-name">${c.name}</p>
+      <p class="grid-client-role">${c.role}</p>
+      ${statusBadge(c.status)}
+      <hr class="grid-divider"/>
+      <div class="grid-stats">
+        <div class="grid-stat-item"><div class="grid-stat-val">${c.revenue.replace('$','$')}</div><div class="grid-stat-lbl">Revenue</div></div>
+        <div class="grid-stat-item"><div class="grid-stat-val">${c.projects}</div><div class="grid-stat-lbl">Projects</div></div>
+      </div>
+      <div class="grid-card-actions">
+        <button class="grid-btn grid-btn-primary" onclick="event.stopPropagation()"><i class="bi bi-chat-dots me-1"></i>Message</button>
+        <button class="grid-btn grid-btn-outline" onclick="event.stopPropagation()"><i class="bi bi-pencil me-1"></i>Edit</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ===== VIEW TOGGLE =====
+function setView(v) {
+  currentView = v;
+  document.getElementById('tableView').style.display = v==='table' ? 'block' : 'none';
+  document.getElementById('gridView').classList.toggle('show', v==='grid');
+  document.getElementById('tableViewBtn').classList.toggle('active', v==='table');
+  document.getElementById('gridViewBtn').classList.toggle('active', v==='grid');
+  if (v==='grid') renderGrid();
+}
+
+// ===== FILTER =====
+function applyFilters() {
+  const search = (document.getElementById('tableSearch').value + document.getElementById('topbarSearch').value).toLowerCase();
+  const status = document.getElementById('statusFilter').value;
+  const industry = document.getElementById('industryFilter').value;
+  filtered = clients.filter(c => {
+    const matchSearch = !search || c.name.toLowerCase().includes(search) || c.email.toLowerCase().includes(search);
+    const matchStatus = !status || c.status === status;
+    const matchIndustry = !industry || c.industry === industry;
+    return matchSearch && matchStatus && matchIndustry;
+  });
+  currentPage = 1;
+  renderTable();
+  if (currentView==='grid') renderGrid();
+}
+
+document.getElementById('tableSearch').addEventListener('input', applyFilters);
+document.getElementById('topbarSearch').addEventListener('input', applyFilters);
+document.getElementById('statusFilter').addEventListener('change', applyFilters);
+document.getElementById('industryFilter').addEventListener('change', applyFilters);
+
+// ===== DETAIL DRAWER =====
+function openDrawer(c) {
+  document.getElementById('drawerAvatar').style.background = c.color;
+  document.getElementById('drawerAvatar').textContent = getInitials(c.name);
+  document.getElementById('drawerName').textContent = c.name;
+  document.getElementById('drawerRole').textContent = c.role + ' · ' + c.industry;
+  document.getElementById('drawerStatus').innerHTML = statusBadge(c.status);
+  document.getElementById('ds1').textContent = c.revenue;
+  document.getElementById('ds2').textContent = c.projects;
+  document.getElementById('ds3').textContent = c.joined.split(' ').pop().slice(-2) + 'y';
+  document.getElementById('drawerEmail').textContent = c.email;
+  document.getElementById('drawerPhone').textContent = c.phone;
+  document.getElementById('drawerLocation').textContent = c.location;
+  document.getElementById('drawerID').textContent = '#' + c.id;
+  document.getElementById('drawerJoined').textContent = c.joined;
+  document.getElementById('drawerActive').textContent = c.lastActive;
+  document.getElementById('detailDrawer').classList.add('open');
+  document.getElementById('drawerOverlay').classList.add('show');
+}
+function closeDrawer() {
+  document.getElementById('detailDrawer').classList.remove('open');
+  document.getElementById('drawerOverlay').classList.remove('show');
+}
+
+// ===== INIT =====
+renderTable();
+</script>
+</body>
+</html>
